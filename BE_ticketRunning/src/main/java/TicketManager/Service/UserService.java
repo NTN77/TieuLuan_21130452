@@ -64,7 +64,7 @@ public class UserService {
 
     }
 
-    public User createUser(UserCreateRequest request) {
+    public AuthenticationRes createUser(UserCreateRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
         if (userRepository.existsByUsername(request.getUserName())) throw new AppException(ErrorCode.USERNAME_EXISTED);
         User user = new User();
@@ -83,20 +83,27 @@ public class UserService {
                     .build());
         }
         user.setRole(role);
-        return userRepository.save(user);
+        userRepository.save(user);
+        var token = generateToken(request.getEmail(), user.getRole().getName());
+
+        return AuthenticationRes.builder()
+                .authenticated(true)
+                .token(token)
+                .authenticated(true)
+                .build();
     }
 
     public AuthenticationRes login(UserLoginReq req) {
         var user = userRepository.findUserByEmail(req.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         boolean matchesPassword = passwordEncoder.matches(req.getPassword(), user.getPassword());
-        if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATED);
-
+        if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATEDPW);
         var token = generateToken(req.getEmail(), user.getRole().getName());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
                 .token(token)
+                .role(user.getRole().getName())
                 .authenticated(true)
                 .build();
     }

@@ -26,19 +26,19 @@ import java.util.List;
 public class UserController {
    final UserService userService;
     @PostMapping
-    ResponseEntity<APIReponse<User>> createUser(@RequestBody UserCreateRequest request){
+    ResponseEntity<APIReponse<AuthenticationRes>> createUser(@RequestBody UserCreateRequest request){
         try {
-            User user = userService.createUser(request);
-            return ResponseEntity.ok(APIReponse.<User>builder().result(user).build());
+            AuthenticationRes user = userService.createUser(request);
+            return ResponseEntity.ok(APIReponse.<AuthenticationRes>builder().result(user).build());
         } catch (AppException ex) {
             return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
-                    .body(APIReponse.<User>builder()
+                    .body(APIReponse.<AuthenticationRes>builder()
                             .code(ex.getErrorCode().getCode())
                             .message(ex.getErrorCode().getMessage())
                             .build());
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(APIReponse.<User>builder()
+                    .body(APIReponse.<AuthenticationRes>builder()
                             .code(500)
                             .message("An unexpected error occurred")
                             .build());

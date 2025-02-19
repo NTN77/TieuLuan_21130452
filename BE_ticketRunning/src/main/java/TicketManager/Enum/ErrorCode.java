@@ -11,11 +11,14 @@ import org.springframework.http.HttpStatusCode;
 public enum ErrorCode {
     // Birthday
     BIRTHDAY_CANNOT_BE_BLANK(2000, "Birthday cannot be blank.", HttpStatus.BAD_REQUEST),
+    BIRTHDAY_CANNOT_FUTURE (2001, "Ngày Sinh không thể ở tương lai!.", HttpStatus.BAD_REQUEST),
+
     // Username Group (code 100x)
     USERNAME_CANNOT_BE_BLANK(1000, "Username cannot be blank", HttpStatus.BAD_REQUEST),
     USERNAME_INVALID(1001, "Username must be at least 3 characters long and can only contain letters, numbers, dots, underscores, and hyphens (e.g., user_name123).", HttpStatus.BAD_REQUEST),
     USERNAME_EXISTED(1002, "Tên đã tồn tại! Hãy chọn tên khác.", HttpStatus.BAD_REQUEST),
-    USERNAME_NOT_EXISTED(1003, "Username not found. Please check the username and try again.", HttpStatus.NOT_FOUND),
+    USERNAME_NOT_EXISTED(1003, "Tên không tồn tại. Hãy kiểm tra lại tên.", HttpStatus.NOT_FOUND),
+
     // User Group (code 101x)
     USER_EXISTED(1012, "User existed", HttpStatus.BAD_REQUEST),
     USER_NOT_EXISTED(1013, "User not existed", HttpStatus.NOT_FOUND),

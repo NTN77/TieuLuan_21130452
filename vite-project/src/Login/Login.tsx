@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import background from '../assets/background.jpg';
 import {useNavigate} from "react-router-dom";
+import {AuthContext} from "../Context/AuthContext.tsx";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -20,6 +21,13 @@ const Login = () => {
         height: '100vh',
         width: '100%',
     }
+    const {
+        setTokenContext,
+        setUsernameContext,
+        setRoleContext,
+        setEmailContext,
+        setStatus,
+    } = useContext(AuthContext);
 
     const signIn = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,15 +45,45 @@ const Login = () => {
             const data = await reponse.json();
             if (data.result.authenticated) {
                 if (data.result.role === "ADMIN") {
-                    localStorage.setItem("token", data.result.token);
+                    setTokenContext(data.result.token);
                     setError("");
                     setInform("Đăng Nhập Thành Công!");
+                    //Lấy thông tin user
+                    const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
+                       method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${data.result.token}`,
+                        },
+                    });
+                    if(userReponse.ok){
+                        const dataUser = await userReponse.json();
+                        setUsernameContext(dataUser.result.username);
+                        setRoleContext(dataUser.result.role.name);
+                        setEmailContext(dataUser.result.email);
+                        setStatus(dataUser.result.status);
+                    }
                     navigate("/Admin");
                 } else {
-                    localStorage.setItem("token", data.result.token);
+                    setTokenContext(data.result.token);
                     setError("");
                     setInform("Đăng Nhập Thành Công!");
-                    navigate("/");
+                    //Lấy thông tin user
+                    const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${data.result.token}`,
+                        },
+                    });
+                    if(userReponse.ok){
+                        const dataUser = await userReponse.json();
+                        setUsernameContext(dataUser.result.username);
+                        setRoleContext(dataUser.result.role.name);
+                        setEmailContext(dataUser.result.email);
+                        setStatus(dataUser.result.status);
+                    }
+                    navigate("/Home");
                 }
             } else {
                 const err = await reponse.json();
@@ -53,6 +91,7 @@ const Login = () => {
             }
         }
     }
+
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>

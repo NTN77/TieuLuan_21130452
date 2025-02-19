@@ -93,7 +93,7 @@ public class UserController {
                             .build());
         }
     }
-    @PostMapping("/my-info")
+    @GetMapping("/my-info")
     APIReponse<User> getMyInfo() {
         return APIReponse.<User>builder().result(userService.getInfor()).build();
     }

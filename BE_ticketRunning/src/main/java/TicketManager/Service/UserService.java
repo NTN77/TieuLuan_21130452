@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +68,8 @@ public class UserService {
     public AuthenticationRes createUser(UserCreateRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
         if (userRepository.existsByUsername(request.getUserName())) throw new AppException(ErrorCode.USERNAME_EXISTED);
+        LocalDate currentDate = LocalDate.now();
+        if (request.getBirthday().isAfter(currentDate)) throw new AppException(ErrorCode.BIRTHDAY_CANNOT_FUTURE);
         User user = new User();
         user.setUsername(request.getUserName());
         user.setEmail(request.getEmail());
@@ -84,7 +87,7 @@ public class UserService {
         }
         user.setRole(role);
         userRepository.save(user);
-        var token = generateToken(request.getEmail(), user.getRole().getName());
+        var token = generateToken(request.getEmail(), user.getRole().getName(),user.getUsername());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
@@ -98,7 +101,7 @@ public class UserService {
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
         boolean matchesPassword = passwordEncoder.matches(req.getPassword(), user.getPassword());
         if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATEDPW);
-        var token = generateToken(req.getEmail(), user.getRole().getName());
+        var token = generateToken(req.getEmail(), user.getRole().getName(),user.getUsername());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
@@ -109,17 +112,18 @@ public class UserService {
     }
 
     //Sinh ra token
-    private String generateToken(String username,String role) {
+    private String generateToken(String email,String role,String userName) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); // header là thuật toán sử dụng
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(email)
                 .issuer("TicketRunning.com")
                 .issueTime(new Date()) // thời gian bd
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 )) // thời hạn (hiện đang là 1 giờ)
                 .claim("role", role)
+                .claim("username",userName)
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());

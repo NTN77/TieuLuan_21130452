@@ -11,9 +11,9 @@ function App() {
         <div>
             {/* Định nghĩa các route */}
             <Routes>
-                <Route path="/" element={<Home/>} />
+                <Route path="/" element={<Login />} />
+                <Route path="/Home" element={<Home/>} />
                 <Route path="/Admin" element={<Admin/>} />
-                <Route path="/Login" element={<Login />} />
                 <Route path="/SignIn" element={<SignIn/>}/>
             </Routes>
         </div>

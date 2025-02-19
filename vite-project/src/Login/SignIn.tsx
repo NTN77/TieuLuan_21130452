@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, {useContext, useState} from "react";
 import { FaEye, FaEyeSlash} from "react-icons/fa";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import "bootstrap/dist/css/bootstrap.min.css";
 import background from '../assets/background.jpg';
 import {useNavigate} from "react-router-dom";
+import {AuthContext} from "../Context/AuthContext.tsx";
 
 const SignIn = () => {
     const navigate = useNavigate();
@@ -21,6 +22,7 @@ const SignIn = () => {
     const [inform,setInform] = useState("");
 
 
+
     const container = {
         backgroundImage: `url(${background})`,
         backgroundSize: 'cover',
@@ -29,13 +31,21 @@ const SignIn = () => {
         width: '100%',
     }
 
+    const {
+        setTokenContext,
+        setUsernameContext,
+        setRoleContext,
+        setEmailContext,
+        setStatus,
+    } = useContext(AuthContext);
+
     const signIn = async (e: React.FormEvent) => {
         e.preventDefault();
         if(password !== confirm ){
             setError("Mật khẩu không khớp!");
             return
         }
-        const reponse = await fetch("http://10.0.239.137:8080/TicketRunning/user", {
+        const reponse = await fetch("http://localhost:8080/TicketRunning/user", {
           method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -50,10 +60,25 @@ const SignIn = () => {
         if(reponse.ok) {
             const data = await reponse.json();
             if (data.result.authenticated) {
-                localStorage.setItem("token", data.result.token);
+                setTokenContext(data.result.token);
                 setError("");
                 setInform("Đăng Ký Thành Công!");
-                navigate("/");
+                //Lấy thông tin user
+                const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${data.result.token}`,
+                    },
+                });
+                if(userReponse.ok){
+                    const dataUser = await userReponse.json();
+                    setUsernameContext(dataUser.result.username);
+                    setRoleContext(dataUser.result.role.name);
+                    setEmailContext(dataUser.result.email);
+                    setStatus(dataUser.result.status);
+                }
+                navigate("/Home");
             }
         }else{
             const  err = await reponse.json();
@@ -65,7 +90,7 @@ const SignIn = () => {
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>
             <div className="card shadow-lg p-4 pt-2" style={{width: "30rem", height: "35rem", borderRadius: "20px"}}>
                 <div className={"d-flex align-items-center justify-content-between"}>
-                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/Login")}>
+                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/")}>
                         <IoMdArrowRoundBack/>
                     </div>
                     <h2 className="text-center fs-3 flex-grow-1 me-4">Đăng Ký</h2>

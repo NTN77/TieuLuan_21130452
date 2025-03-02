@@ -1,0 +1,44 @@
+.container_home{
+    background: #f9f6fa;
+}
+.carousel-intro {
+    width: 95%;
+    margin: auto;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 3%;
+}
+
+.swiper {
+    width: 100%;
+    height: auto;
+}
+
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carousel-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    border-radius: 10px;
+}
+/*Đều chỉnh các giải chạy*/
+.event_home {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    padding: 20px;
+}
+
+/*BTC*/
+.BTC{
+    width: 95%;
+    margin: auto;
+    border-radius: 20px;
+    margin-bottom: 3%;
+    background: white;
+}

@@ -1,0 +1,15 @@
+.cssFace{
+    background: #ffffff;
+    color: #4d4c4c;
+    font-size: 14px;
+    font-weight: normal;
+    width: 27rem;
+    border: 1px #dadce0 solid;
+    margin-top: 1rem;
+    display: flex;
+}
+.cssFace i{
+    color: blue;
+    font-size: 20px;
+    margin-right: 31%;
+}

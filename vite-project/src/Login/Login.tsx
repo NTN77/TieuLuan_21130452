@@ -1,9 +1,15 @@
 import React, {useContext, useState} from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import {FaEye, FaEyeSlash} from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import background from '../assets/background.jpg';
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../Context/AuthContext.tsx";
+import axios from "axios";
+import {GoogleLogin} from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
+import FacebookLogin from 'react-facebook-login';
+import './Login.css'
+import {IoMdArrowRoundBack} from "react-icons/io";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -18,17 +24,13 @@ const Login = () => {
         backgroundImage: `url(${background})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
-        height: '100vh',
+        height: '130vh',
         width: '100%',
     }
     const {
         setTokenContext,
-        setUsernameContext,
-        setRoleContext,
-        setEmailContext,
-        setStatus,
-    } = useContext(AuthContext);
 
+    } = useContext(AuthContext);
     const signIn = async (e: React.FormEvent) => {
         e.preventDefault();
         const reponse = await fetch("http://localhost:8080/TicketRunning/auth/token", {
@@ -45,45 +47,17 @@ const Login = () => {
             const data = await reponse.json();
             if (data.result.authenticated) {
                 if (data.result.role === "ADMIN") {
-                    setTokenContext(data.result.token);
                     setError("");
                     setInform("Đăng Nhập Thành Công!");
-                    //Lấy thông tin user
-                    const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
-                       method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${data.result.token}`,
-                        },
-                    });
-                    if(userReponse.ok){
-                        const dataUser = await userReponse.json();
-                        setUsernameContext(dataUser.result.username);
-                        setRoleContext(dataUser.result.role.name);
-                        setEmailContext(dataUser.result.email);
-                        setStatus(dataUser.result.status);
-                    }
+                    sessionStorage.setItem('token',data.result.token);
+                    setTokenContext(data.result.token);
                     navigate("/Admin");
                 } else {
+                    sessionStorage.setItem('token',data.result.token)
                     setTokenContext(data.result.token);
                     setError("");
                     setInform("Đăng Nhập Thành Công!");
-                    //Lấy thông tin user
-                    const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
-                        method: "GET",
-                        headers: {
-                            "Content-Type": "application/json",
-                            Authorization: `Bearer ${data.result.token}`,
-                        },
-                    });
-                    if(userReponse.ok){
-                        const dataUser = await userReponse.json();
-                        setUsernameContext(dataUser.result.username);
-                        setRoleContext(dataUser.result.role.name);
-                        setEmailContext(dataUser.result.email);
-                        setStatus(dataUser.result.status);
-                    }
-                    navigate("/Home");
+                    navigate("/");
                 }
             } else {
                 const err = await reponse.json();
@@ -91,12 +65,129 @@ const Login = () => {
             }
         }
     }
+    // Đăng nhập gg vs face
+    interface GoogleUser {
+        email: string;
+        name: string;
+    }
+    const handleGoogleLogin = async (credentialResponse: any) => {
+        if (credentialResponse.credential) {
+            const decoded: GoogleUser = jwtDecode<GoogleUser>(credentialResponse.credential.trim());
+            const userData = {
+                email: decoded.email,
+                username: decoded.name,
+            };
+            // Gửi dữ liệu về BE
+            const reponse = await fetch("http://localhost:8080/TicketRunning/auth/loginGG", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            });
+            if(reponse.ok) {
+                const data = await reponse.json();
+                if (data.result.authenticated) {
+                    if (data.result.role === "ADMIN") {
+                        setError("");
+                        setInform("Đăng Nhập Thành Công!");
+                        sessionStorage.setItem('token',data.result.token);
+                        setTokenContext(data.result.token);
+                        navigate("/Admin");
+                    } else {
+                        sessionStorage.setItem('token',data.result.token)
+                        setTokenContext(data.result.token);
+                        setError("");
+                        setInform("Đăng Nhập Thành Công!");
+                        navigate("/");
+                    }
+                } else {
+                    const err = await reponse.json();
+                    setError(err.message);
+                }
+            }
+        }
+    };
+    const handleGoogleSuccess = async (response) => {
+        const { credential } = response;
+        try {
+            const res = await axios.post("http://localhost:8080/TicketRunning/auth/google", { tokenId: credential });
+            const data = res.data;
+            if (data.result.authenticated) {
+                if (data.result.role === "ADMIN") {
+                    setError("");
+                    setInform("Đăng Nhập Thành Công!");
+                    sessionStorage.setItem('token',data.result.token);
+                    setTokenContext(data.result.token);
+                    navigate("/Admin");
+                } else {
+                    sessionStorage.setItem('token',data.result.token)
+                    setTokenContext(data.result.token);
+                    setError("");
+                    setInform("Đăng Nhập Thành Công!");
+                    navigate("/");
+                    }
+                } else {
+                    setError(data.message);
+            }
+        } catch (error) {
+            console.error("Google login failed:", error);
+            setError("Có lỗi xảy ra, vui lòng thử lại!");
+        }
+    };
 
+    const responseFacebook = async (response) => {
+        console.log(response);
+        if (response) {
+            const userData = {
+                email: response.email,
+                username: response.name,
+            };
+            // Gửi dữ liệu về BE
+            const reponse2 = await fetch("http://localhost:8080/TicketRunning/auth/loginGG", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(userData),
+            });
+            if(reponse2.ok) {
+                const data = await reponse2.json();
+                if (data.result.authenticated) {
+                    if (data.result.role === "ADMIN") {
+                        setError("");
+                        setInform("Đăng Nhập Thành Công!");
+                        sessionStorage.setItem('token',data.result.token);
+                        setTokenContext(data.result.token);
+                        navigate("/Admin");
+                    } else {
+                        sessionStorage.setItem('token',data.result.token)
+                        setTokenContext(data.result.token);
+                        setError("");
+                        setInform("Đăng Nhập Thành Công!");
+                        navigate("/");
+                    }
+                } else {
+                    const err = await reponse2.json();
+                    setError(err.message);
+                }
+            }
+        }
+    };
+
+    const componentClicked = (event) => {
+        console.log('Facebook button clicked');
+    };
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>
-            <div className="card shadow-lg p-4" style={{width: "30rem", height: "25rem", borderRadius: "20px"}}>
-                <h2 className="text-center mb-2 fs-2">Đăng Nhập</h2>
+            <div className="card shadow-lg p-4" style={{width: "30rem", height: "29rem", borderRadius: "20px"}}>
+                <div className={"d-flex d-flex align-items-center justify-content-between"}>
+                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/")}>
+                        <IoMdArrowRoundBack/>
+                    </div>
+                    <h2 className="text-center fs-3 flex-grow-1 me-4">Đăng Nhập</h2>
+                </div>
 
                 <form onSubmit={signIn}>
                     <div className="mb-2">
@@ -128,7 +219,7 @@ const Login = () => {
                     </div>
                     <div>
                         {error && <p className={"text-danger text-center"}>{error}</p>}
-                        {inform && <p className={"text-bg-light text-center"}>{inform}</p>}
+                        {inform && <p className={"text-bg-light text-center text-success"}>{inform}</p>}
 
                     </div>
                     <button
@@ -143,7 +234,27 @@ const Login = () => {
                     <span className={"ms-1"} onClick={() => navigate("/SignIn")}
                           style={{cursor: "pointer", color: "red", textDecoration: "underline"}}>Đăng Ký</span>
                 </div>
+                <div className={"mt-3"}>
+                    <GoogleLogin
+                        onSuccess={handleGoogleLogin}
+                        onError={() => {
+                            console.log('Login Failed');
+                        }}
+                    />
+                    <FacebookLogin
+                        appId="616119721124541"
+                        autoLoad={true}
+                        fields="name,email"
+                        scope="email"
+                        onClick={componentClicked}
+                        callback={responseFacebook}
+                        textButton="Đăng nhập với Facebook"
+                        cssClass="cssFace"
+                        icon="fa-facebook"
+                    />
+                </div>
             </div>
+
         </div>
     );
 };

@@ -1,4 +1,4 @@
-import React, { createContext, useState, ReactNode } from "react";
+import React, {createContext, useState, ReactNode, useEffect} from "react";
 
 // Định nghĩa kiểu dữ liệu cho Context
 type AuthContextType = {
@@ -38,8 +38,43 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setStatus(null);
         setRoleContext(null);
 
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
     };
+
+    useEffect(() => {
+        const token = sessionStorage.getItem("token");
+        if (token) {
+            setTokenContext(token);
+        }
+    }, []);
+
+    useEffect(() => {
+        if (tokenContext) {
+            const fetchData = async () => {
+                try {
+                    const userResponse = await fetch("http://localhost:8080/TicketRunning/user/my-info", {
+                        method: "GET",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${tokenContext}`,
+                        },
+                    });
+
+                    if (userResponse.ok) {
+                        const dataUser = await userResponse.json();
+                        setUsernameContext(dataUser.result.username);
+                        setRoleContext(dataUser.result.role.name);
+                        setEmailContext(dataUser.result.email);
+                        setStatus(dataUser.result.status);
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi lấy thông tin người dùng:", error);
+                }
+            };
+
+            fetchData();
+        }
+    }, [tokenContext]);
 
     return (
         <AuthContext.Provider

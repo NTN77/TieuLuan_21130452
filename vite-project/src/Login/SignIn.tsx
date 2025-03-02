@@ -33,10 +33,6 @@ const SignIn = () => {
 
     const {
         setTokenContext,
-        setUsernameContext,
-        setRoleContext,
-        setEmailContext,
-        setStatus,
     } = useContext(AuthContext);
 
     const signIn = async (e: React.FormEvent) => {
@@ -63,22 +59,9 @@ const SignIn = () => {
                 setTokenContext(data.result.token);
                 setError("");
                 setInform("Đăng Ký Thành Công!");
-                //Lấy thông tin user
-                const userReponse = await fetch("http://localhost:8080/TicketRunning/user/my-info",{
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${data.result.token}`,
-                    },
-                });
-                if(userReponse.ok){
-                    const dataUser = await userReponse.json();
-                    setUsernameContext(dataUser.result.username);
-                    setRoleContext(dataUser.result.role.name);
-                    setEmailContext(dataUser.result.email);
-                    setStatus(dataUser.result.status);
-                }
-                navigate("/Home");
+                sessionStorage.setItem('token',data.result.token);
+                setTokenContext(data.result.token);
+                navigate("/");
             }
         }else{
             const  err = await reponse.json();
@@ -90,7 +73,7 @@ const SignIn = () => {
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>
             <div className="card shadow-lg p-4 pt-2" style={{width: "30rem", height: "35rem", borderRadius: "20px"}}>
                 <div className={"d-flex align-items-center justify-content-between"}>
-                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/")}>
+                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/Login")}>
                         <IoMdArrowRoundBack/>
                     </div>
                     <h2 className="text-center fs-3 flex-grow-1 me-4">Đăng Ký</h2>

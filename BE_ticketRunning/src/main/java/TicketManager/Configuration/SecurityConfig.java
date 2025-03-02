@@ -1,6 +1,5 @@
 package TicketManager.Configuration;
 
-import TicketManager.Entity.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,7 +22,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
-import java.util.Base64;
 import java.util.List;
 
 @Configuration
@@ -34,7 +32,8 @@ public class SecurityConfig {
     private String SIGNER_KEY;
     private final String[] PUBLIC_ENDPOINTS_POST = {
             "/user","/user/{id}"
-            ,"/auth/token","/auth/introspect"
+            ,"/auth/token","/auth/introspect",
+            "/auth/loginGG","/auth/facebook"
 
     }, PUBLIC_ENDPOINTS_GET = {},
     ENDPOINTS_ADMIN = {"/user/allUser"}; // endpoint dành riêng cho admin
@@ -49,12 +48,12 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.GET,ENDPOINTS_ADMIN).hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()); // các endpoint còn lại phải đăng nhập
-        httpSecurity.oauth2ResourceServer(
+
+            httpSecurity.oauth2ResourceServer(
                 oauth2 -> oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
                                 .jwtAuthenticationConverter(jwtAuthenticationConverter()))
         );
-
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         httpSecurity.cors(cors -> cors.configure(httpSecurity));
         return httpSecurity.build();

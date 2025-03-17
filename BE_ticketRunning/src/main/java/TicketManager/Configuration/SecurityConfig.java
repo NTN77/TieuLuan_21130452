@@ -31,14 +31,16 @@ public class SecurityConfig {
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
     private final String[] PUBLIC_ENDPOINTS_POST = {
-            "/user","/user/{id}"
+            "/user","/user/{id}","/user/SignIn/sendCode"
             ,"/auth/token","/auth/introspect",
-            "/auth/loginGG","/auth/facebook"
+            "/auth/loginGG","/auth/facebook",
+            "/images/upload",
+    }, PUBLIC_ENDPOINTS_GET = {"/event/findByName","/event/eventHome","/event/eventAll","/event/BTC"},
+    ENDPOINTS_GET_ADMIN = {"/user/allUser"}, // endpoint dành riêng cho admin
+    ENDPOINTS_POST_ADMIN = { "/event/createEvent","/event/addBTC"}; // endpoint dành riêng cho admin
 
-    }, PUBLIC_ENDPOINTS_GET = {},
-    ENDPOINTS_ADMIN = {"/user/allUser"}; // endpoint dành riêng cho admin
 
-        @Bean
+    @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
         httpSecurity.authorizeHttpRequests(request ->
@@ -46,7 +48,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET,ENDPOINTS_ADMIN).hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET,ENDPOINTS_GET_ADMIN).hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.POST,ENDPOINTS_POST_ADMIN).hasAnyAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated()); // các endpoint còn lại phải đăng nhập
 
             httpSecurity.oauth2ResourceServer(

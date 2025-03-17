@@ -21,6 +21,4 @@ public class UserCreateRequest {
     @NotBlank(message = "PASSWORD_CANNOT_BE_BLANK")
     @Size(min = 6, message = "PASSWORD_INVALID")
     String password;
-    @Past(message = "INVALID_DOB")
-    LocalDate birthday;
 }

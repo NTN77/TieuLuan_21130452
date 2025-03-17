@@ -5,6 +5,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import background from '../assets/background.jpg';
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../Context/AuthContext.tsx";
+import Swal from "sweetalert2";
+
 
 const SignIn = () => {
     const navigate = useNavigate();
@@ -15,9 +17,9 @@ const SignIn = () => {
     const [userName,setUserName] = useState("");
     const [email,setEmail] = useState("");
     const [password,setPassword] = useState("");
+    const [code,setCode] = useState("");
+    const [codeCorrect,setCodeCorrect] = useState("");
     const [confirm,setConfirm] = useState("");
-    const [birthday,setBirthday] = useState("");
-
     const [error,setError] = useState("");
     const [inform,setInform] = useState("");
 
@@ -30,6 +32,12 @@ const SignIn = () => {
         height: '100vh',
         width: '100%',
     }
+    const buttonCode = {
+        backgroundColor: 'red',
+        color: 'white',
+        width: '30%',
+        marginLeft: '10px',
+    }
 
     const {
         setTokenContext,
@@ -41,27 +49,67 @@ const SignIn = () => {
             setError("Mật khẩu không khớp!");
             return
         }
-        const reponse = await fetch("http://localhost:8080/TicketRunning/user", {
-          method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                userName: userName,
-                email: email,
-                password: password,
-                birthday: birthday
-            }),
+        if(code == ""){
+            setError("Chưa điền mã xác nhận!");
+            return
+        }else if(code != codeCorrect){
+            setError("Sai mã xác nhận!");
+            return;
+        }else {
+            const reponse = await fetch("http://localhost:8080/TicketRunning/user", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    userName: userName,
+                    email: email,
+                    password: password,
+                }),
+            });
+            if (reponse.ok) {
+                const data = await reponse.json();
+                if (data.result.authenticated) {
+                    Swal.fire({
+                        title: "Đăng Ký Thành Công!",
+                        icon: "success",
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    setTokenContext(data.result.token);
+                    setError("");
+                    setInform("Đăng Ký Thành Công!");
+                    sessionStorage.setItem('token', data.result.token);
+                    setTokenContext(data.result.token);
+                    navigate("/");
+                }
+            } else {
+                const err = await reponse.json();
+                setError(err.message);
+                setCodeCorrect("");
+            }
+        }
+    }
+    //Lấy mã xác nhận
+    const sendCode = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if(email == ""){
+            setError("Cần điền email để nhận mã xác nhận!");
+            return;
+        }
+        const reponse = await fetch(`http://localhost:8080/TicketRunning/user/SignIn/sendCode?email=${email}`, {
+            method: "POST",
         });
         if(reponse.ok) {
+            Swal.fire({
+                title: "Lấy Mã Xác Nhận Thành Công!",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false
+            });
             const data = await reponse.json();
-            if (data.result.authenticated) {
-                setTokenContext(data.result.token);
-                setError("");
-                setInform("Đăng Ký Thành Công!");
-                sessionStorage.setItem('token',data.result.token);
-                setTokenContext(data.result.token);
-                navigate("/");
+            if (data.result) {
+                setCodeCorrect(data.result);
             }
         }else{
             const  err = await reponse.json();
@@ -135,13 +183,16 @@ const SignIn = () => {
             </span>
                     </div>
                     <div className="mb-3">
-                        <label className="form-label fs-6 ">Ngày Sinh:</label>
-                        <input
-                            type="date"
-                            className="form-control fs-6"
-                            onChange={(e) => setBirthday(e.target.value)}
-                            required={true}
-                        />
+                        <label className="form-label fs-6 ">Mã Xác Nhận:</label>
+                        <div className={"d-flex"}>
+                            <input
+                                type="text"
+                                className="form-control"
+                                onChange={(e) => setCode(e.target.value)}
+                                required={true}
+                            />
+                            <button onClick={sendCode} style={buttonCode}>Lấy Mã</button>
+                        </div>
                     </div>
                     <div>
                         {error && <p className={"text-danger text-center"}>{error}</p>}

@@ -108,34 +108,6 @@ const Login = () => {
             }
         }
     };
-    const handleGoogleSuccess = async (response) => {
-        const { credential } = response;
-        try {
-            const res = await axios.post("http://localhost:8080/TicketRunning/auth/google", { tokenId: credential });
-            const data = res.data;
-            if (data.result.authenticated) {
-                if (data.result.role === "ADMIN") {
-                    setError("");
-                    setInform("Đăng Nhập Thành Công!");
-                    sessionStorage.setItem('token',data.result.token);
-                    setTokenContext(data.result.token);
-                    navigate("/Admin");
-                } else {
-                    sessionStorage.setItem('token',data.result.token)
-                    setTokenContext(data.result.token);
-                    setError("");
-                    setInform("Đăng Nhập Thành Công!");
-                    navigate("/");
-                    }
-                } else {
-                    setError(data.message);
-            }
-        } catch (error) {
-            console.error("Google login failed:", error);
-            setError("Có lỗi xảy ra, vui lòng thử lại!");
-        }
-    };
-
     const responseFacebook = async (response) => {
         console.log(response);
         if (response) {
@@ -175,9 +147,9 @@ const Login = () => {
         }
     };
 
-    const componentClicked = (event) => {
-        console.log('Facebook button clicked');
-    };
+    // const componentClicked = (event) => {
+    //     console.log('Facebook button clicked');
+    // };
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>
@@ -243,10 +215,9 @@ const Login = () => {
                     />
                     <FacebookLogin
                         appId="616119721124541"
-                        autoLoad={true}
+                        autoLoad={false}
                         fields="name,email"
                         scope="email"
-                        onClick={componentClicked}
                         callback={responseFacebook}
                         textButton="Đăng nhập với Facebook"
                         cssClass="cssFace"

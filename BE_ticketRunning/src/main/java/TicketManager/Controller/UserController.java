@@ -4,8 +4,10 @@ import TicketManager.DTO.Reponse.APIReponse;
 import TicketManager.DTO.Reponse.AuthenticationRes;
 import TicketManager.DTO.Request.UserCreateRequest;
 import TicketManager.DTO.Request.UserLoginReq;
+import TicketManager.Entity.Email;
 import TicketManager.Entity.User;
 import TicketManager.Exception.AppException;
+import TicketManager.Service.MailService;
 import TicketManager.Service.UserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +27,7 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
    final UserService userService;
+   final MailService emailService;
     @PostMapping
     ResponseEntity<APIReponse<AuthenticationRes>> createUser(@RequestBody UserCreateRequest request){
         try {
@@ -96,5 +99,16 @@ public class UserController {
     @GetMapping("/my-info")
     APIReponse<User> getMyInfo() {
         return APIReponse.<User>builder().result(userService.getInfor()).build();
+    }
+
+    @PostMapping("/SignIn/sendCode")
+    public APIReponse<Integer> sendEmail(@RequestParam String email) {
+        String subject = "Mã Code Đăng Ký Tài Khoản";
+        int code = emailService.code();
+        String text = "Mã Code đăng ký tài khoản của bạn :" + code +"\n Chỉ có thể sử dụng 1 lần!";
+        emailService.sendEmail(email, subject, text);
+        return APIReponse.<Integer>builder()
+                .result(code)
+                .build();
     }
 }

@@ -1,0 +1,16 @@
+.container_filter{
+    border: 1px solid gray;
+    border-radius: 20px;
+    width: fit-content;
+}
+.filter_all{
+    cursor: pointer;
+    padding: 3px;
+    font-style: italic;
+    font-weight: lighter;
+}
+.container_filter:hover{
+    background: red;
+    color: white;
+}
+

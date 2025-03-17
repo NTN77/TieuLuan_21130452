@@ -30,7 +30,7 @@ const Footer = () => {
             <div className={"d-flex"} style={overplay}>
                 <div className={"content_1"}>
                     <div className={"d-flex justify-content-center"}>
-                        <Link className="navbar-brand d-flex align-items-center" to="/home">
+                        <Link className="navbar-brand d-flex align-items-center" to="/">
                             <img src="/iconMain.png" alt="Logo" width={"180vw"} className="me-2" style={{}}/>
                         </Link>
                     </div>

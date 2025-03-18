@@ -21,6 +21,5 @@ public class EventReponse {
     private LocalDate eventDate;
     @Column(nullable = false,columnDefinition = "LONGTEXT")
     private String description;
-    private int total;
     private double minPrice;
 }

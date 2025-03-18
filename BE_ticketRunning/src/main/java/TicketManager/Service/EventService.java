@@ -37,7 +37,6 @@ public class EventService {
         event.setStatus(true);
         event.setLocation(eventRequest.getLocation());
         event.setEventDate(eventRequest.getEventDate());
-        event.setTotal(eventRequest.getTotal());
         event = eventRepository.save(event);
         String imageUrl = cloudinaryService.uploadImage(file.getBytes(), event.getId(), "avatar");
         event.setAvatar(imageUrl);
@@ -46,11 +45,6 @@ public class EventService {
     public Optional<Event> getEventbyName(String name) {
         return eventRepository.findEventByName(name);
     }
-    //Top 6 event sắp diễn ra
-    public List<Event> listTop6Event() {
-        return eventRepository.findTop6ByOrderByEventDateAsc();
-    }
-
     //Lấy 6 event gâần nhất
     public List<EventReponse> listTop6EventHome(){
         List<Object[]> rawResults = eventRepository.findTop6Event(LocalDate.now());
@@ -63,17 +57,12 @@ public class EventService {
             event.setLocation((String) row[2]);
             event.setEventDate((LocalDate) row[3]);
             event.setDescription((String) row[4]);
-            event.setTotal((Integer) row[5]);
-            event.setMinPrice(row[6] != null ? (Double) row[6] : 0.0);
+            event.setMinPrice(row[5] != null ? (Double) row[5] : 0.0);
             events.add(event);
         }
         return events;
     }
 //GetAll
-    public List<Event> findAll(){
-        return eventRepository.findAll();
-    }
-
     public List<EventReponse> getAll() {
         List<Object[]> rawResults = eventRepository.findAllEventsWithMinPrice(LocalDate.now());
         List<EventReponse> events = new ArrayList<>();
@@ -85,8 +74,7 @@ public class EventService {
             event.setLocation((String) row[2]);
             event.setEventDate((LocalDate) row[3]);
             event.setDescription((String) row[4]);
-            event.setTotal((Integer) row[5]);
-            event.setMinPrice(row[6] != null ? (Double) row[6] : 0.0);
+            event.setMinPrice(row[5] != null ? (Double) row[5] : 0.0);
             events.add(event);
         }
         return events;

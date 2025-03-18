@@ -19,7 +19,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     Optional<Event> findEventByName(String name);
     boolean existsEventByName(String name);
     List<Event> findTop6ByOrderByEventDateAsc(); //lấy top 6 sự kiện gần nhất
-    @Query("SELECT e.name, e.avatar, e.location, e.eventDate, e.description, e.total, " +
+    @Query("SELECT e.name, e.avatar, e.location, e.eventDate, e.description, " +
             "COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
             " WHERE ep.event.id = e.id " +
             " AND ep.dateStart <= :currentDate " +
@@ -28,7 +28,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
     List<Object[]> findAllEventsWithMinPrice(@Param("currentDate") LocalDate currentDate);
 //Top 6 giải gần nhất
 @Query("SELECT e.name AS name, e.avatar AS avatar, e.location AS location, " +
-        "e.eventDate AS eventDate, e.description AS description, e.total AS total, " +
+        "e.eventDate AS eventDate, e.description AS description, " +
         "COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
         " WHERE ep.event.id = e.id " +
         " AND ep.dateStart <= :currentDate " +

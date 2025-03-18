@@ -4,6 +4,8 @@ import axios from "axios";
 const CreateEvent = () => {
     const [eventName, setEventName] = useState("");
     const [eventDescription, setEventDescription] = useState("");
+    const [eventName, setEventName] = useState("");
+
     const [eventDate, setEventDate] = useState("");
     const [ticketStages, setTicketStages] = useState([]);
 
@@ -98,6 +100,9 @@ const CreateEvent = () => {
 
                 <label>Mô tả sự kiện:</label>
                 <textarea value={eventDescription} onChange={(e) => setEventDescription(e.target.value)} required/>
+
+                <lable>Nơi diễn ra sự kiện:</lable>
+                <textarea></textarea>
 
                 <label>Ngày diễn ra:</label>
                 <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} required/>

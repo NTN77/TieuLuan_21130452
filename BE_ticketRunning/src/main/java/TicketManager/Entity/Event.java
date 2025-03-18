@@ -29,5 +29,4 @@ public class Event {
     private boolean status;
     @Column(nullable = false,columnDefinition = "LONGTEXT")
     private String description;
-    private int total;
 }

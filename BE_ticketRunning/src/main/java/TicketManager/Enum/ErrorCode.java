@@ -38,6 +38,10 @@ public enum ErrorCode {
 
     UNAUTHORIZED(1041, "You do not have permission", HttpStatus.FORBIDDEN),
     UNACCOUNT(1042, "Tài khoản đã tồn tại!", HttpStatus.UNAUTHORIZED),
+//    Error EVENT
+    NAME_EVENT_EXIST(3001,"Tên sự kiện đã tồn tại!", HttpStatus.BAD_REQUEST),
+    //    Error BTC
+    NAME_BTC_EXIST(4001,"Tên ban tổ chức đã tồn tại!",HttpStatus.BAD_REQUEST),
     ;
     int code;
     String message;

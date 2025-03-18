@@ -1,0 +1,45 @@
+.filter-sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px; /* Ẩn ban đầu */
+    width: 320px;
+    height: 100%;
+    background-color: white;
+    box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: right 0.3s ease-in-out;
+    overflow-y: auto;
+    z-index: 1050;
+}
+
+.filter-sidebar.open {
+    right: 0; /* Hiển thị khi mở */
+}
+
+.filter-header {
+    background: #f8f9fa;
+    font-weight: bold;
+}
+
+.filter-body {
+    max-height: calc(100vh - 56px);
+    overflow-y: auto;
+}
+
+.btn-outline-primary.active {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.form-range {
+    width: 100%;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: 500;
+}

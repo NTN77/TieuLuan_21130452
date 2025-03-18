@@ -72,18 +72,14 @@ public class UserService {
     public AuthenticationRes createUser(UserCreateRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
         if (userRepository.existsByUsername(request.getUserName())) throw new AppException(ErrorCode.USERNAME_EXISTED);
-        LocalDate currentDate = LocalDate.now();
-        if (request.getBirthday().isAfter(currentDate)) throw new AppException(ErrorCode.BIRTHDAY_CANNOT_FUTURE);
 
 
         User user = new User();
         user.setUsername(request.getUserName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setPassword(request.getPassword());
         user.setStatus(true);
         user.setCreateAt(Timestamp.from(Instant.now()));
-        user.setBirthDate(request.getBirthday());
         Role role = roleRepository.findAllByName(String.valueOf(roleEnum.USER));
         if (role == null) {
             role = roleRepository.save(Role.builder()

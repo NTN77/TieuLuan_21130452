@@ -15,14 +15,14 @@ const MenuBar = () => {
     return (
         <nav className="navbar navbar-expand-lg navbar-light bg-light fixed-top">
             <div className="container">
-                <Link className="navbar-brand d-flex align-items-center" to="/home">
+                <Link className="navbar-brand d-flex align-items-center" to="/">
                     <img src="/iconMain.png" alt="Logo" width="55rem" className="me-2" />
                     <span style={{color: "#455d67"}}>NTNRunning</span>
                 </Link>
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/">
+                            <Link className="nav-link fs-5" to="/Event">
                                 Giải Chạy
                             </Link>
                         </li>

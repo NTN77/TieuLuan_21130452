@@ -5,6 +5,7 @@ import TicketManager.DTO.Reponse.IntrospecReponse;
 import TicketManager.DTO.Reponse.UserReponse;
 import TicketManager.DTO.Request.IntrospecRequest;
 import TicketManager.DTO.Request.UserCreateRequest;
+import TicketManager.DTO.Request.UserLoginGG;
 import TicketManager.DTO.Request.UserLoginReq;
 import TicketManager.Entity.Role;
 import TicketManager.Entity.User;
@@ -24,17 +25,21 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -64,9 +69,13 @@ public class UserService {
 
     }
 
-    public User createUser(UserCreateRequest request) {
+    public AuthenticationRes createUser(UserCreateRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) throw new AppException(ErrorCode.EMAIL_EXISTED);
         if (userRepository.existsByUsername(request.getUserName())) throw new AppException(ErrorCode.USERNAME_EXISTED);
+        LocalDate currentDate = LocalDate.now();
+        if (request.getBirthday().isAfter(currentDate)) throw new AppException(ErrorCode.BIRTHDAY_CANNOT_FUTURE);
+
+
         User user = new User();
         user.setUsername(request.getUserName());
         user.setEmail(request.getEmail());
@@ -83,16 +92,8 @@ public class UserService {
                     .build());
         }
         user.setRole(role);
-        return userRepository.save(user);
-    }
-
-    public AuthenticationRes login(UserLoginReq req) {
-        var user = userRepository.findUserByEmail(req.getEmail())
-                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
-        boolean matchesPassword = passwordEncoder.matches(req.getPassword(), user.getPassword());
-        if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATED);
-
-        var token = generateToken(req.getEmail(), user.getRole().getName());
+        userRepository.save(user);
+        var token = generateToken(request.getEmail(), user.getRole().getName(),user.getUsername());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
@@ -101,18 +102,34 @@ public class UserService {
                 .build();
     }
 
+    public AuthenticationRes login(UserLoginReq req) {
+        var user = userRepository.findUserByEmail(req.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        boolean matchesPassword = passwordEncoder.matches(req.getPassword(), user.getPassword());
+        if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATEDPW);
+        var token = generateToken(req.getEmail(), user.getRole().getName(),user.getUsername());
+
+        return AuthenticationRes.builder()
+                .authenticated(true)
+                .token(token)
+                .role(user.getRole().getName())
+                .authenticated(true)
+                .build();
+    }
+
     //Sinh ra token
-    private String generateToken(String username,String role) {
+    public String generateToken(String email,String role,String userName) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); // header là thuật toán sử dụng
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(username)
+                .subject(email)
                 .issuer("TicketRunning.com")
                 .issueTime(new Date()) // thời gian bd
                 .expirationTime(new Date(
                         Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
                 )) // thời hạn (hiện đang là 1 giờ)
                 .claim("role", role)
+                .claim("username",userName)
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -149,5 +166,44 @@ public class UserService {
         String email = context.getAuthentication().getName();
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return user;
+    }
+    //Login GG vs Face
+    public AuthenticationRes processOAuthLogin(UserLoginGG user) {
+        String email = user.getEmail();
+        String name = user.getUsername();
+        if(!userRepository.existsByEmail(email)){
+            User user1 = new User();
+            user1.setEmail(email);
+            user1.setUsername(name);
+            user1.setStatus(true);
+            user1.setCreateAt(Timestamp.from(Instant.now()));
+            Role role = roleRepository.findAllByName(String.valueOf(roleEnum.USER));
+            if (role == null) {
+                role = roleRepository.save(Role.builder()
+                        .id(1)
+                        .name(String.valueOf(roleEnum.USER))
+                        .build());
+            }
+            user1.setRole(role); // Mặc định role là USER
+
+            // Lưu user vào database
+            userRepository.save(user1);
+            var token = generateToken(user1.getEmail(), user1.getRole().getName(),user1.getUsername());
+            return AuthenticationRes.builder()
+                    .authenticated(true)
+                    .token(token)
+                    .role(user1.getRole().getName())
+                    .authenticated(true)
+                    .build();
+        }else{
+            User u = userRepository.findUserByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            var token = generateToken(u.getEmail(), u.getRole().getName(),u.getUsername());
+            return AuthenticationRes.builder()
+                    .authenticated(true)
+                    .token(token)
+                    .role(u.getRole().getName())
+                    .authenticated(true)
+                    .build();
+        }
     }
 }

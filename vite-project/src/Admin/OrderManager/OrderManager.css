@@ -1,0 +1,11 @@
+.btnHover:hover {
+    background: red;
+    color: white;
+}
+.informNumber {
+    background: red;
+    color: white;
+    border-radius: 50%;
+    position: absolute;
+    right: 15px;
+}

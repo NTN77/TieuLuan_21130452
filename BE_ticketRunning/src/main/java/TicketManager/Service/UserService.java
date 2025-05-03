@@ -31,6 +31,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -89,7 +90,7 @@ public class UserService {
         }
         user.setRole(role);
         userRepository.save(user);
-        var token = generateToken(request.getEmail(), user.getRole().getName(),user.getUsername());
+        var token = generateToken(request.getEmail(), user.getRole().getName(), user.getUsername());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
@@ -101,9 +102,12 @@ public class UserService {
     public AuthenticationRes login(UserLoginReq req) {
         var user = userRepository.findUserByEmail(req.getEmail())
                 .orElseThrow(() -> new AppException(ErrorCode.UNAUTHENTICATED));
+        if (!user.isStatus()) {
+            throw new AppException(ErrorCode.BLOCKACCOUNT);
+        }
         boolean matchesPassword = passwordEncoder.matches(req.getPassword(), user.getPassword());
         if (!matchesPassword) throw new AppException(ErrorCode.UNAUTHENTICATEDPW);
-        var token = generateToken(req.getEmail(), user.getRole().getName(),user.getUsername());
+        var token = generateToken(req.getEmail(), user.getRole().getName(), user.getUsername());
 
         return AuthenticationRes.builder()
                 .authenticated(true)
@@ -114,7 +118,7 @@ public class UserService {
     }
 
     //Sinh ra token
-    public String generateToken(String email,String role,String userName) {
+    public String generateToken(String email, String role, String userName) {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512); // header là thuật toán sử dụng
 
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
@@ -122,10 +126,10 @@ public class UserService {
                 .issuer("TicketRunning.com")
                 .issueTime(new Date()) // thời gian bd
                 .expirationTime(new Date(
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()
-                )) // thời hạn (hiện đang là 1 giờ)
+                        Instant.now().plus(5, ChronoUnit.HOURS).toEpochMilli()
+                )) // thời hạn (hiện đang là 5 giờ)
                 .claim("role", role)
-                .claim("username",userName)
+                .claim("username", userName)
                 .build();
 
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
@@ -147,15 +151,18 @@ public class UserService {
         user.setStatus(false);
         return userRepository.save(user);
     }
+
     //Lấy thong tin tat ca user
-    public List<User> listUser(){
+    public List<User> listUser() {
         return userRepository.findAll();
     }
+
     //ấy thông tin 1 user theo id
-    public User findUserById(String id){
+    public User findUserById(String id) {
         return userRepository.findUserById(UUID.fromString(id))
                 .orElseThrow(() -> new AppException(ErrorCode.UNACCOUNT));
     }
+
     public User getInfor() {
         var context = SecurityContextHolder.getContext();
         System.out.println(context);
@@ -163,11 +170,17 @@ public class UserService {
         User user = userRepository.findUserByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         return user;
     }
+
+    public User findByUserAdmin(UUID uuid) {
+        User user = userRepository.findUserById(uuid).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        return user;
+    }
+
     //Login GG vs Face
     public AuthenticationRes processOAuthLogin(UserLoginGG user) {
         String email = user.getEmail();
         String name = user.getUsername();
-        if(!userRepository.existsByEmail(email)){
+        if (!userRepository.existsByEmail(email)) {
             User user1 = new User();
             user1.setEmail(email);
             user1.setUsername(name);
@@ -184,16 +197,16 @@ public class UserService {
 
             // Lưu user vào database
             userRepository.save(user1);
-            var token = generateToken(user1.getEmail(), user1.getRole().getName(),user1.getUsername());
+            var token = generateToken(user1.getEmail(), user1.getRole().getName(), user1.getUsername());
             return AuthenticationRes.builder()
                     .authenticated(true)
                     .token(token)
                     .role(user1.getRole().getName())
                     .authenticated(true)
                     .build();
-        }else{
+        } else {
             User u = userRepository.findUserByEmail(email).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
-            var token = generateToken(u.getEmail(), u.getRole().getName(),u.getUsername());
+            var token = generateToken(u.getEmail(), u.getRole().getName(), u.getUsername());
             return AuthenticationRes.builder()
                     .authenticated(true)
                     .token(token)
@@ -201,5 +214,46 @@ public class UserService {
                     .authenticated(true)
                     .build();
         }
+    }
+
+    //Change Information user
+    @Transactional
+    public boolean chageInformation(UUID idUser, String newName) {
+        int update = userRepository.updateName(newName, idUser);
+        return update > 0;
+    }
+
+    @Transactional
+    public boolean updateStatus(UUID idUser, boolean status) {
+        int update = userRepository.updateStatus(idUser, status);
+        return update > 0;
+    }
+
+    @Transactional
+    public boolean updateInformation(UUID idUser, String email, String newName, int idRole) {
+        Role role = roleRepository.findById(idRole).orElse(null);
+        if (role == null) {
+            if (idRole == 2) {
+                role = Role.builder()
+                        .id(2)
+                        .name(String.valueOf(roleEnum.MANAGER))
+                        .build();
+                role = roleRepository.save(role);
+            } else {
+                return false;
+            }
+        }
+        Optional<User> optionalUser = userRepository.findById(idUser);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            user.setEmail(email);
+            user.setUsername(newName);
+            user.setRole(role);
+            user.setUpdateAt(Timestamp.from(Instant.now()));
+            userRepository.save(user);
+            return true;
+        }
+
+        return false;
     }
 }

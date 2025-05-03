@@ -6,6 +6,7 @@ import background from '../assets/background.jpg';
 import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../Context/AuthContext.tsx";
 import Swal from "sweetalert2";
+import Loading from "../Payment/Loading.tsx";
 
 
 const SignIn = () => {
@@ -22,6 +23,9 @@ const SignIn = () => {
     const [confirm,setConfirm] = useState("");
     const [error,setError] = useState("");
     const [inform,setInform] = useState("");
+    const [loading,setLoading] = useState(false);
+    const [isValid, setIsValid] = useState(true);
+
 
 
 
@@ -44,16 +48,20 @@ const SignIn = () => {
     } = useContext(AuthContext);
 
     const signIn = async (e: React.FormEvent) => {
+        setLoading(true);
         e.preventDefault();
         if(password !== confirm ){
             setError("Mật khẩu không khớp!");
+            setLoading(false);
             return
         }
         if(code == ""){
             setError("Chưa điền mã xác nhận!");
+            setLoading(false);
             return
         }else if(code != codeCorrect){
             setError("Sai mã xác nhận!");
+            setLoading(false);
             return;
         }else {
             const reponse = await fetch("http://localhost:8080/TicketRunning/user", {
@@ -68,6 +76,7 @@ const SignIn = () => {
                 }),
             });
             if (reponse.ok) {
+                setLoading(false);
                 const data = await reponse.json();
                 if (data.result.authenticated) {
                     Swal.fire({
@@ -84,23 +93,37 @@ const SignIn = () => {
                     navigate("/");
                 }
             } else {
+                setLoading(false);
                 const err = await reponse.json();
                 setError(err.message);
                 setCodeCorrect("");
             }
         }
     }
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
     //Lấy mã xác nhận
     const sendCode = async (e: React.FormEvent) => {
+        setLoading(true);
         e.preventDefault();
         if(email == ""){
             setError("Cần điền email để nhận mã xác nhận!");
+            setLoading(false);
             return;
         }
+        if(!isValid){
+            setError("Email sai cú pháp!")
+            setLoading(false);
+            return;
+        }
+        setError("");
         const reponse = await fetch(`http://localhost:8080/TicketRunning/user/SignIn/sendCode?email=${email}`, {
             method: "POST",
         });
         if(reponse.ok) {
+            setLoading(false);
             Swal.fire({
                 title: "Lấy Mã Xác Nhận Thành Công!",
                 icon: "success",
@@ -112,6 +135,7 @@ const SignIn = () => {
                 setCodeCorrect(data.result);
             }
         }else{
+            setLoading(false);
             const  err = await reponse.json();
             setError(err.message);
         }
@@ -143,8 +167,10 @@ const SignIn = () => {
                             type="email"
                             className="form-control fs-6"
                             placeholder="Nhập email của bạn"
-                            onChange={(e) => setEmail(e.target.value)}
-                            required={true}
+                            onChange={(e) =>{ setEmail(e.target.value);
+                                setIsValid(validateEmail(e.target.value))
+                            }}
+                        required={true}
                         />
                     </div>
                     <div className=" position-relative fs-6 mb-2">
@@ -152,6 +178,7 @@ const SignIn = () => {
                         <input
                             type={showPassword ? "text" : "password"}
                             className="form-control fs-6"
+                            minLength={8}
                             placeholder="Nhập mật khẩu"
                             onChange={(e) => setPassword(e.target.value)}
                             required={true}
@@ -170,6 +197,7 @@ const SignIn = () => {
                         <input
                             type={showPassword2 ? "text" : "password"}
                             className="form-control fs-6"
+                            minLength={8}
                             placeholder="Nhập lại mật khẩu"
                             onChange={(e) => setConfirm(e.target.value)}
                             required={true}
@@ -208,6 +236,7 @@ const SignIn = () => {
                 </form>
 
             </div>
+            {loading && (<Loading/>)}
         </div>
     );
 };

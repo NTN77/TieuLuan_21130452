@@ -1,6 +1,7 @@
 package TicketManager.DTO.Request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.Column;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -4,6 +4,8 @@ import React, {createContext, useState, ReactNode, useEffect} from "react";
 type AuthContextType = {
     tokenContext: string | null;
     setTokenContext: (token: string | null) => void;
+    idContext : string | null;
+    setIdContext: (token: string | null) => void;
     usernameContext: string | null;
     setUsernameContext: (username: string | null) => void;
     emailContext: string | null;
@@ -25,6 +27,7 @@ type AuthProviderProps = {
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [tokenContext, setTokenContext] = useState<string | null>(null);
+    const [idContext, setIdContext] = useState<string | null>(null);
     const [usernameContext, setUsernameContext] = useState<string | null>(null);
     const [emailContext, setEmailContext] = useState<string | null>(null);
     const [status, setStatus] = useState<string | null>(null);
@@ -33,6 +36,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Hàm logout
     const logout = () => {
         setTokenContext(null);
+        setIdContext(null);
         setUsernameContext(null);
         setEmailContext(null);
         setStatus(null);
@@ -62,6 +66,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
                     if (userResponse.ok) {
                         const dataUser = await userResponse.json();
+                        setIdContext(dataUser.result.id);
                         setUsernameContext(dataUser.result.username);
                         setRoleContext(dataUser.result.role.name);
                         setEmailContext(dataUser.result.email);
@@ -81,6 +86,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             value={{
                 tokenContext,
                 setTokenContext,
+                idContext,
+                setIdContext,
                 usernameContext,
                 setUsernameContext,
                 emailContext,

@@ -2,7 +2,7 @@ import React, {useContext, useState} from "react";
 import {FaEye, FaEyeSlash} from "react-icons/fa";
 import "bootstrap/dist/css/bootstrap.min.css";
 import background from '../assets/background.jpg';
-import {useNavigate} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {AuthContext} from "../Context/AuthContext.tsx";
 import axios from "axios";
 import {GoogleLogin} from "@react-oauth/google";
@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import FacebookLogin from 'react-facebook-login';
 import './Login.css'
 import {IoMdArrowRoundBack} from "react-icons/io";
+import Loading from "../Payment/Loading.tsx";
 
 const Login = () => {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Login = () => {
 
     const [error,setError] = useState("");
     const [inform,setInform] = useState("");
-
+    const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const container = {
         backgroundImage: `url(${background})`,
@@ -32,6 +33,7 @@ const Login = () => {
 
     } = useContext(AuthContext);
     const signIn = async (e: React.FormEvent) => {
+        setLoading(true);
         e.preventDefault();
         const reponse = await fetch("http://localhost:8080/TicketRunning/auth/token", {
             method: "POST",
@@ -45,14 +47,17 @@ const Login = () => {
         });
         if(reponse.ok) {
             const data = await reponse.json();
+            const allowedRoles = ["ADMIN", "MANAGER"];
             if (data.result.authenticated) {
-                if (data.result.role === "ADMIN") {
+                if (allowedRoles.includes(data.result.role)) {
+                    setLoading(false);
                     setError("");
                     setInform("Đăng Nhập Thành Công!");
                     sessionStorage.setItem('token',data.result.token);
                     setTokenContext(data.result.token);
                     navigate("/Admin");
                 } else {
+                    setLoading(false);
                     sessionStorage.setItem('token',data.result.token)
                     setTokenContext(data.result.token);
                     setError("");
@@ -60,9 +65,14 @@ const Login = () => {
                     navigate("/");
                 }
             } else {
+                setLoading(false);
                 const err = await reponse.json();
                 setError(err.message);
             }
+        }else {
+            const err = await reponse.json();
+            setLoading(false);
+            setError(err.message);
         }
     }
     // Đăng nhập gg vs face
@@ -71,6 +81,8 @@ const Login = () => {
         name: string;
     }
     const handleGoogleLogin = async (credentialResponse: any) => {
+        setLoading(true);
+
         if (credentialResponse.credential) {
             const decoded: GoogleUser = jwtDecode<GoogleUser>(credentialResponse.credential.trim());
             const userData = {
@@ -87,14 +99,18 @@ const Login = () => {
             });
             if(reponse.ok) {
                 const data = await reponse.json();
+                const allowedRoles = ["ADMIN", "MANAGER"];
                 if (data.result.authenticated) {
-                    if (data.result.role === "ADMIN") {
+                    if (allowedRoles.includes(data.result.role)) {
                         setError("");
+                        setLoading(false);
                         setInform("Đăng Nhập Thành Công!");
                         sessionStorage.setItem('token',data.result.token);
                         setTokenContext(data.result.token);
+
                         navigate("/Admin");
                     } else {
+                        setLoading(false);
                         sessionStorage.setItem('token',data.result.token)
                         setTokenContext(data.result.token);
                         setError("");
@@ -102,6 +118,7 @@ const Login = () => {
                         navigate("/");
                     }
                 } else {
+                    setLoading(false);
                     const err = await reponse.json();
                     setError(err.message);
                 }
@@ -109,7 +126,7 @@ const Login = () => {
         }
     };
     const responseFacebook = async (response) => {
-        console.log(response);
+        setLoading(true);
         if (response) {
             const userData = {
                 email: response.email,
@@ -125,14 +142,17 @@ const Login = () => {
             });
             if(reponse2.ok) {
                 const data = await reponse2.json();
+                setLoading(false);
+                const allowedRoles = ["ADMIN", "MANAGER"];
                 if (data.result.authenticated) {
-                    if (data.result.role === "ADMIN") {
+                    if (allowedRoles.includes(data.result.role)) {
                         setError("");
                         setInform("Đăng Nhập Thành Công!");
                         sessionStorage.setItem('token',data.result.token);
                         setTokenContext(data.result.token);
                         navigate("/Admin");
                     } else {
+                        setLoading(false);
                         sessionStorage.setItem('token',data.result.token)
                         setTokenContext(data.result.token);
                         setError("");
@@ -140,6 +160,7 @@ const Login = () => {
                         navigate("/");
                     }
                 } else {
+                    setLoading(false);
                     const err = await reponse2.json();
                     setError(err.message);
                 }
@@ -147,17 +168,15 @@ const Login = () => {
         }
     };
 
-    // const componentClicked = (event) => {
-    //     console.log('Facebook button clicked');
-    // };
 
     return (
         <div className="d-flex justify-content-center align-items-center vh-100 bg-light " style={container}>
-            <div className="card shadow-lg p-4" style={{width: "30rem", height: "29rem", borderRadius: "20px"}}>
+            {loading && (<Loading/>)}
+            <div className="card shadow-lg p-4" style={{width: "30rem", height: "32rem", borderRadius: "20px"}}>
                 <div className={"d-flex d-flex align-items-center justify-content-between"}>
-                    <div className={"fs-2 mb-2"} style={{cursor: "pointer"}} onClick={() => navigate("/")}>
+                    <Link to={"/"} className={"fs-2 mb-2"} style={{cursor: "pointer"}}>
                         <IoMdArrowRoundBack/>
-                    </div>
+                    </Link>
                     <h2 className="text-center fs-3 flex-grow-1 me-4">Đăng Nhập</h2>
                 </div>
 
@@ -196,7 +215,8 @@ const Login = () => {
                     </div>
                     <button
                         type="submit"
-                        className="btn btn-primary w-100"
+                        className="btn btn-primary w-100 "
+
                     >
                         Đăng Nhập
                     </button>
@@ -219,6 +239,7 @@ const Login = () => {
                         fields="name,email"
                         scope="email"
                         callback={responseFacebook}
+                        onFailure={(error) => console.error("Facebook login error:", error)}
                         textButton="Đăng nhập với Facebook"
                         cssClass="cssFace"
                         icon="fa-facebook"

@@ -20,5 +20,4 @@ public class EventRequest {
     private LocalDate eventDate;
     @Column(nullable = false)
     private String description;
-    private int total;
 }

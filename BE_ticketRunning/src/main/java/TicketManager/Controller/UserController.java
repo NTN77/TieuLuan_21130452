@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -111,4 +112,26 @@ public class UserController {
                 .result(code)
                 .build();
     }
+
+    @PostMapping("/changeInformation")
+    public ResponseEntity<APIReponse<Boolean>> changeUserName(@RequestParam String idUser, @RequestParam String newName){
+        try {
+            UUID id = java.util.UUID.fromString(idUser);
+            boolean result =  userService.chageInformation(id,newName);
+            return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
+        } catch (AppException ex) {
+            return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+                    .body(APIReponse.<Boolean>builder()
+                            .code(ex.getErrorCode().getCode())
+                            .message(ex.getErrorCode().getMessage())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIReponse.<Boolean>builder()
+                            .code(500)
+                            .message("An unexpected error occurred")
+                            .build());
+        }
+    }
+
 }

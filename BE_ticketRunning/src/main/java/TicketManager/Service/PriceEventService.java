@@ -9,6 +9,7 @@ import lombok.Data;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,7 +28,11 @@ public class PriceEventService {
         return priceEventRepostitory.save(priceEvent);
     }
 
-//    public PriceEvent findMinPrice(UUID idEvent) {
-//        return priceEventRepostitory.findMinPriceForEachActiveEvent(idEvent,new Date());
-//    }
+    public boolean deletePriceEvent(UUID idEvent){
+        return priceEventRepostitory.deleteByEventId(idEvent) > 0;
+    }
+
+    public List<PriceEvent> findPriceEventByEvent_Id(UUID idEvent){
+        return priceEventRepostitory.findPriceEventsByEvent_Id(idEvent);
+    }
 }

@@ -101,6 +101,25 @@
 			<version>2.15.0</version> <!-- Hoặc phiên bản mới nhất -->
 		</dependency>
 
+<!--		Tạo Excel-->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>5.2.3</version>
+		</dependency>
+
+		<!-- QRCode -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+
 		<!--		-->
 		<dependency>
 			<groupId>org.springframework.security</groupId>

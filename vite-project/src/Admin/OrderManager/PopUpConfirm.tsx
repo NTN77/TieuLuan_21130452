@@ -36,6 +36,7 @@ const PopUpConfirm = ({customer,cancelConfirm}) => {
             });
             const data = await response.json();
             console.log("Gửi thành công!", data);
+            cancelConfirm();
 
         } catch (error) {
             setLoading(false);

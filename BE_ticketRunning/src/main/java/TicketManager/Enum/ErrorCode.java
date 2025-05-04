@@ -47,6 +47,9 @@ public enum ErrorCode {
 
     //    Error BTC
     NAME_BTC_EXIST(4001,"Tên ban tổ chức đã tồn tại!",HttpStatus.BAD_REQUEST),
+
+    //Error không có customer để printExcel
+    NOT_PRINT_EXCEL(5000,"Không có người đăng ký để in ra excel!",HttpStatus.NOT_FOUND),
     ;
     int code;
     String message;

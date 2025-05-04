@@ -4,6 +4,9 @@ import {AuthContext} from "../../Context/AuthContext.tsx";
 import {IoMdArrowRoundBack} from "react-icons/io";
 import PopUpCustomerDetail from "./PopUpCustomerDetail.tsx";
 import PopUpConfirm from "./PopUpConfirm.tsx";
+import Swal from "sweetalert2";
+import Loading from "../../Payment/Loading.tsx";
+import EditCustomerInformation from "./EditCustomerInformation.tsx";
 
 const ListSignUpOfEvent = ({eventSelect,cancel}) => {
     const [customers,setCustomers] = useState([]);
@@ -15,6 +18,8 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
     const [customerSelect,setCustomerSelect] = useState("");
     const [openPopUp,setOpenPopUp] = useState(false);
     const [confirmButton,setConfirmButton] = useState(false);
+    const [openEditInformation,setOpenEditInformation] = useState(false);
+    const [loading,setLoading] = useState(false);
 
 
     //Sắp xếp sự kiện
@@ -89,10 +94,70 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
     }
     const cacelConfirm = () => {
         setCustomerSelect("");
-
         setConfirmButton(false);
     }
+    const PopupEdit = (customerInfor) =>{
+        setCustomerSelect(customerInfor);
+        setOpenEditInformation(true);
+    }
+    const cacelEdit= () => {
+        setCustomerSelect("");
+        setOpenEditInformation(false);
+    }
 
+    //Hàm in ra Excel
+    const areAllCustomersNull = () => {
+        return customers.every(customer => customer.bib === null);
+    }
+        const downloadExcel = async () => {
+        if(customers.length == 0 || areAllCustomersNull()) {
+            Swal.fire({
+                title: "Không có người đăng ký sự kiện đã xác thực!",
+                icon: "error",
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+        setLoading(true);
+            try {
+                const response = await fetch(`http://localhost:8080/TicketRunning/admin/exportCustomers?idEvent=${eventSelect.id}`, {
+                    method: 'GET',
+                    headers: {
+                        "Authorization": `Bearer ${tokenContext}`
+                    },
+                });
+
+                if (!response.ok) {
+                    setLoading(false);
+                    throw new Error('Lỗi khi tải file Excel');
+                    return;
+                }
+
+                const blob = await response.blob();
+
+                // Tạo link tải file
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'CustomerSignInEvent.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                URL.revokeObjectURL(url);
+                setLoading(false);
+                Swal.fire({
+                    title: "Tải Excel Thành Công!",
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+
+            } catch (error) {
+                setLoading(false);
+                console.error('Download error:', error);
+            }
+    };
 
     // Danh sách event hiển thị theo trang
     const displayCustomer = filteredCustomers
@@ -110,9 +175,9 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
                     </span>
                 </td>
                 <td className={"d-flex justify-content-center"}>
-                    <button className="btn btnHover btn-sm btn-primary me-2">Chỉnh sửa
+                    <button className="btn btnHover btn-sm btn-primary me-2" onClick={() => PopupEdit(customer)}>Chỉnh sửa
                     </button>
-                    <button className="btn btnHover btn-sm btn-success me-2" onClick={() => PopupConfirm(customer)}>Xác thực
+                    <button className="btn btnHover btn-sm btn-success me-2" onClick={() => PopupConfirm(customer)} disabled={customer.bib != null}>Xác thực
                     </button>
                     <button className="btn btnHover btn-sm btn-primary me-2" onClick={() => customerDetail(customer)}>Thông tin chi tiết
                     </button>
@@ -146,7 +211,7 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
                         }}
                     />
                     <div className={"mt-2"}>
-                        <button className="btn btnHover btn-sm btn-success me-2">Xuất danh sách ra Excel <p className={"mb-0 fst-italic"}>(đã xác thực)</p>
+                        <button className="btn btnHover btn-sm btn-success me-2" onClick={downloadExcel}>Xuất danh sách ra Excel <p className={"mb-0 fst-italic"}>(đã xác thực)</p>
                         </button>
                     </div>
 
@@ -193,6 +258,8 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
             </div>
             {openPopUp && (<PopUpCustomerDetail customer={customerSelect} cancel={cacelPopUp}/>)}
             {confirmButton && (<PopUpConfirm customer={customerSelect} cancelConfirm={cacelConfirm}/>)}
+            {openEditInformation && (<EditCustomerInformation Customer={customerSelect} cancelEdit={cacelEdit}/>)}
+            {loading && (<Loading/>)}
         </div>
     )
 }

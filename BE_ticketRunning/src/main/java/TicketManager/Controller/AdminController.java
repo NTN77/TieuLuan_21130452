@@ -1,22 +1,25 @@
 package TicketManager.Controller;
 
 import TicketManager.DTO.Reponse.*;
+import TicketManager.DTO.Request.CustomerSignInRequest;
 import TicketManager.DTO.Request.EditInformationRequest;
 import TicketManager.DTO.Request.EventPriceRequest;
 import TicketManager.DTO.Request.EventRequest;
-import TicketManager.Entity.Event;
-import TicketManager.Entity.EventDetail;
-import TicketManager.Entity.PriceEvent;
-import TicketManager.Entity.User;
+import TicketManager.Entity.*;
 import TicketManager.Enum.ErrorCode;
 import TicketManager.Exception.AppException;
 import TicketManager.Service.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +44,7 @@ public class AdminController {
     final EventDetailService eventDetailService;
     final UserService userService;
     final CloudinaryService cloudinaryService;
+    final MailService mailService;
 
     //Lấy ra data số lượng đăng ký để làm dashboard
     @GetMapping("/dashboard/dataDashBoard")
@@ -330,6 +334,19 @@ public class AdminController {
     public ResponseEntity<APIReponse<Boolean>> updateBibAndSendInfor(@RequestParam("idCustomer") UUID idCustomer , @RequestParam("bib") String bib){
         try {
             boolean result = customerInformationService.updateBib(idCustomer,bib);
+            CustomerInformation ci = customerInformationService.findById(idCustomer);
+            User u = userService.findUserById(ci.getIdUser());
+            Event event = eventService.findById(ci.getEventId());
+            String gender = ci.isGender() ? "Nam" : "Nữ";
+            String qrData = event.getName()+ "\n\n Mã số Bib: " + bib +
+                            "\n\nHọ và tên: " + ci.getUserName() +"\t Email: " + ci.getEmail() +
+                            "\t Giới tính: " + gender + "\t Số điện thoại: " + ci.getPhoneNumber() +
+                            "\t Ngày sinh:" + ci.getBirthDate() + "\t Cự ly: " + ci.getEventDistance() +
+                            "\t CCCD: " + ci.getIdentityCard() + "\t Size áo: " + ci.getSizeChart() +
+                            "\t Quốc tịch: " + ci.getNationality() + "\t Quốc gia: " + ci.getCountry() +
+                            "\t Tỉnh/Thành Phố: " +ci.getProvince();
+            mailService.sendQRCodeEmail(u.getEmail(),"Thông báo nhận BIB",qrData);
+            mailService.sendQRCodeEmail(ci.getEmail(),"Thông báo nhận BIB",qrData);
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
             //Thiếu gửi email
         } catch (AppException ex) {
@@ -347,4 +364,87 @@ public class AdminController {
         }
     }
 
+    //Xuất ra excel dữ liệu
+    @GetMapping("/exportCustomers")
+    public void exportUsersToExcel( @RequestParam("idEvent") UUID idEvent,HttpServletResponse response ) throws IOException {
+        List<CustomerInformation> customers = customerInformationService.printExcel(idEvent);
+        if (customers.isEmpty() ) {
+            throw new AppException(ErrorCode.NOT_PRINT_EXCEL);
+        }
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "attachment; filename=users.xlsx");
+        Event e = eventService.findById(idEvent);
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet("Danh Sách Người Tham Gia Sự Kiện " + e.getName());
+
+        Row header = sheet.createRow(0);
+        header.createCell(0).setCellValue("ID");
+        header.createCell(1).setCellValue("Cự ly");
+        header.createCell(2).setCellValue("Họ và tên");
+        header.createCell(3).setCellValue("Email");
+        header.createCell(4).setCellValue("Số điện thoại");
+        header.createCell(5).setCellValue("Căn cước công dân");
+        header.createCell(6).setCellValue("Giới tính");
+        header.createCell(7).setCellValue("Ngày sinh");
+        header.createCell(8).setCellValue("Quốc tịch");
+        header.createCell(9).setCellValue("Quốc gia");
+        header.createCell(10).setCellValue("Tỉnh/Thành phố đang sinh sống");
+        header.createCell(11).setCellValue("Size áo");
+        header.createCell(12).setCellValue("Tên người liên lạc khẩn cấp");
+        header.createCell(13).setCellValue("Số điện thoại người khẩn cấp");
+        header.createCell(14).setCellValue("Nhóm máu");
+        header.createCell(15).setCellValue("Thông tin y tế");
+        header.createCell(16).setCellValue("Mã số bib");
+
+
+
+
+        int rowNum = 1;
+        for (CustomerInformation user : customers) {
+            Row row = sheet.createRow(rowNum++);
+            row.createCell(0).setCellValue(rowNum);
+            row.createCell(1).setCellValue(user.getEventDistance());
+            row.createCell(2).setCellValue(user.getUserName());
+            row.createCell(3).setCellValue(user.getEmail());
+            row.createCell(4).setCellValue(user.getPhoneNumber());
+            row.createCell(5).setCellValue(user.getIdentityCard());
+            row.createCell(6).setCellValue(user.isGender());
+            row.createCell(7).setCellValue(user.getBirthDate());
+            row.createCell(8).setCellValue(user.getNationality());
+            row.createCell(9).setCellValue(user.getCountry());
+            row.createCell(10).setCellValue(user.getProvince());
+            row.createCell(11).setCellValue(user.getSizeChart());
+            row.createCell(12).setCellValue(user.getUserNameKC());
+            row.createCell(13).setCellValue(user.getPhoneNumberKC());
+            row.createCell(14).setCellValue(user.getBloodGroup());
+            row.createCell(15).setCellValue(user.getHealthCare());
+            row.createCell(16).setCellValue(user.getBib());
+
+        }
+
+        ServletOutputStream outputStream = response.getOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+        outputStream.close();
+    }
+    @PostMapping(value ="/editInformationSignIn")
+    public ResponseEntity<APIReponse<Boolean>> editInformationSignIn(@RequestBody CustomerSignInRequest request){
+        try {
+            boolean result = customerInformationService.editInformationSignIn(request);
+            return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
+        } catch (AppException ex) {
+            return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+                    .body(APIReponse.<Boolean>builder()
+                            .code(ex.getErrorCode().getCode())
+                            .message(ex.getErrorCode().getMessage())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIReponse.<Boolean>builder()
+                            .code(500)
+                            .message("An unexpected error occurred")
+                            .build());
+        }
+
+    }
 }

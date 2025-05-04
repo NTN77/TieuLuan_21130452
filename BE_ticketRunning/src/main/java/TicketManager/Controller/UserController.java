@@ -79,7 +79,7 @@ public class UserController {
     }
     //find User By Id
     @PostMapping("/{id}")
-    public ResponseEntity<APIReponse<User>> findUserById(@PathVariable String id) {
+    public ResponseEntity<APIReponse<User>> findUserById(@PathVariable UUID id) {
         try {
             User user = userService.findUserById(id);
             return ResponseEntity.ok(APIReponse.<User>builder().result(user).build());

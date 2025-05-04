@@ -158,8 +158,8 @@ public class UserService {
     }
 
     //ấy thông tin 1 user theo id
-    public User findUserById(String id) {
-        return userRepository.findUserById(UUID.fromString(id))
+    public User findUserById(UUID id) {
+        return userRepository.findUserById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.UNACCOUNT));
     }
 

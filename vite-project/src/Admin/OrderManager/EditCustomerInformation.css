@@ -1,0 +1,12 @@
+.containerEdit{
+    position: absolute;
+    top: 10%;
+    left: 17%;
+    height: 86vh;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 20px;
+}
+.btnHover:hover{
+    background: red;
+}

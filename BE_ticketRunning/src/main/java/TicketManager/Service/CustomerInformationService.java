@@ -5,6 +5,7 @@ import TicketManager.DTO.Reponse.CustomerSignInReponse;
 import TicketManager.DTO.Reponse.DataMonth;
 import TicketManager.DTO.Reponse.RevenueByMonth;
 import TicketManager.DTO.Request.CustomerInformationRequest;
+import TicketManager.DTO.Request.CustomerSignInRequest;
 import TicketManager.Entity.CustomerInformation;
 import TicketManager.Entity.Event;
 import TicketManager.Repository.CustomerInformationRepo;
@@ -167,5 +168,17 @@ public class CustomerInformationService {
     //Update bib cho người đăng ký
     public boolean updateBib(UUID idCustomer , String bib){
         return customerInformationRepo.updateBib(idCustomer,bib) > 0;
+    }
+
+    //In ra excel
+    public List<CustomerInformation> printExcel(UUID idEvent){
+        return customerInformationRepo.printExcel(idEvent);
+    }
+
+    //update thông tin
+    public boolean editInformationSignIn(CustomerSignInRequest request){
+        return customerInformationRepo.updateInformationSignIn(request.getIdUser(),request.getUserName(),request.getPhoneNumber(),request.getIdentityCard(),request.isGender(),request.getNationality(),
+                request.getCountry(),request.getBirthDate(),request.getProvince(),
+                request.getSizeChart(),request.getUserNameKC(),request.getPhoneNumberKC(),request.getBloodGroup(),request.getHealthCare()) > 0 ;
     }
 }

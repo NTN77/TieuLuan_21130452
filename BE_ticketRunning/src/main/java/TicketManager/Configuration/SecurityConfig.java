@@ -39,8 +39,8 @@ public class SecurityConfig {
             PUBLIC_ENDPOINTS_GET = {"/event/findByName","/event/eventHome","/event/eventAll",
             "/event/eventTop6Sell","/event/BTC","/event/search","/event/filter","/event/eventDetail",
             "/Event/Payment/vn-pay-callback","/information/listEventSignIn"},
-    ENDPOINTS_GET_ADMIN = {"/user/allUser","/admin/dashboard/dataDashBoard","/admin/findByUser/{id}","/admin/allEvent","/admin/eventDetail","/admin/orderManagerEvent","/admin/allCustomerOfEvent"}, // endpoint dành riêng cho admin
-    ENDPOINTS_POST_ADMIN = { "/event/createEvent","/event/addBTC","/admin/updateStatus","/admin/updateInformation","/admin/updateStatusEvent","/admin/editEvent","/admin/updateBibAndSendMail"}; // endpoint dành riêng cho admin
+    ENDPOINTS_GET_ADMIN = {"/user/allUser","/admin/dashboard/dataDashBoard","/admin/findByUser/{id}","/admin/allEvent","/admin/eventDetail","/admin/orderManagerEvent","/admin/allCustomerOfEvent","/admin/exportCustomers"}, // endpoint dành riêng cho admin
+    ENDPOINTS_POST_ADMIN = { "/event/createEvent","/event/addBTC","/admin/updateStatus","/admin/updateInformation","/admin/updateStatusEvent","/admin/editEvent","/admin/updateBibAndSendMail","/admin/editInformationSignIn"}; // endpoint dành riêng cho admin
 
 
     @Bean

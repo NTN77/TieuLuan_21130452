@@ -11,7 +11,6 @@ const  BTC = () => {
     useEffect(() => {
         fetch(`http://localhost:8080/TicketRunning/event/BTC`)
             .then(response => {
-                console.log("Response status:", response.status);
                 if (!response.ok) {
                     throw new Error("Lỗi khi lấy dữ liệu!");
                 }

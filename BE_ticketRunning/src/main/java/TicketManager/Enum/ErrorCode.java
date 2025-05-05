@@ -34,14 +34,22 @@ public enum ErrorCode {
     EMAIL_NOT_EXISTED(1023, "Email không tồn tại! Hãy dùng email khác và thử lại.", HttpStatus.NOT_FOUND),
     // Authentication and Authorization (code 104x),
     UNAUTHENTICATED(1040, "Email không tồn tại!.", HttpStatus.UNAUTHORIZED),
-    UNAUTHENTICATEDPW(1040, "Mật khẩu không chính xác!.", HttpStatus.UNAUTHORIZED),
+    UNAUTHENTICATEDPW(1041, "Mật khẩu không chính xác!.", HttpStatus.UNAUTHORIZED),
+    BLOCKACCOUNT(1042, "Tài Khoản đã bị khóa!.", HttpStatus.FORBIDDEN),
+
 
     UNAUTHORIZED(1041, "You do not have permission", HttpStatus.FORBIDDEN),
     UNACCOUNT(1042, "Tài khoản đã tồn tại!", HttpStatus.UNAUTHORIZED),
 //    Error EVENT
     NAME_EVENT_EXIST(3001,"Tên sự kiện đã tồn tại!", HttpStatus.BAD_REQUEST),
+    UPDATE_EVENT_FAILED(3002,"Chỉnh sửa sự kiện thất bại!", HttpStatus.UNPROCESSABLE_ENTITY),
+    DELETE_EVENT_FAILED(3003,"Xóa sự kiện thất bại!", HttpStatus.UNPROCESSABLE_ENTITY),
+
     //    Error BTC
     NAME_BTC_EXIST(4001,"Tên ban tổ chức đã tồn tại!",HttpStatus.BAD_REQUEST),
+
+    //Error không có customer để printExcel
+    NOT_PRINT_EXCEL(5000,"Không có người đăng ký để in ra excel!",HttpStatus.NOT_FOUND),
     ;
     int code;
     String message;

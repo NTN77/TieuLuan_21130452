@@ -1,0 +1,59 @@
+.container_informationSignUp{
+    border: 1px solid #c4bfbf;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+/*Left*/
+.left {
+    flex: 2;
+    border-right: 1px solid #c7c5c5;
+}
+.distance_Event .distance p{
+    width: 5rem;
+    height: 3rem;
+    border-radius: 20px;
+    background: #007bff;
+    color: white;
+    margin: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+.distance_Event .distance p:hover{
+    background: red;
+}
+.inforInput{
+    flex: 1;
+    margin-right: 15px;
+}
+/*Right*/
+.right {
+    flex: 1;
+}
+/*summarize*/
+ .summarize {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    height: fit-content;
+}
+.summarize .summarize_avatar img{
+    border-radius: 20px;
+    padding:10px;
+}
+.summarize_containerSellTicket .summarize_minPrice{
+    width: fit-content;
+    margin: auto;
+}
+.summarize_containerSellTicket .summarize_sellTicketButton{
+    background: blue;
+    border-radius: 20px;
+    color: white;
+}
+.summarize_containerSellTicket .summarize_sellTicketButton:hover{
+    background: red;
+    color: white;
+}

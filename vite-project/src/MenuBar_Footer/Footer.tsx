@@ -10,6 +10,7 @@ const Footer = () => {
         backgroundRepeat: 'no-repeat',
         backgroundPosition: "center",
         position: "relative",
+        bottom: 0,
         zIndex: 1,
         width: '100%',
         height:'25vw',

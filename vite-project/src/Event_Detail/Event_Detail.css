@@ -1,0 +1,98 @@
+.header_eventDetail{
+    border: 1px solid #c4bfbf;
+    border-radius: 20px;
+    margin-bottom: 1rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+/*.avatarEvent img{*/
+/*    width: -webkit-fill-available;*/
+/*}*/
+.solid{
+    background: #b9b9b9;
+    height: 1px;
+}
+.header_eventDetail .inforHeader .inforEventDetail {
+    flex: 2;
+    margin:30px;
+}
+/*Button Mua vé*/
+.header_eventDetail .inforHeader .sellTicket{
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.borderTopBlue {
+    background: #007bff;
+    border-radius: 20px;
+    box-shadow: 0 2px 20px rgba(0, 14, 255, 0.4);
+
+}
+.containerSellTicket{
+    border: 1px solid #c7c7c7;
+    border-radius: 20px;
+    height: fit-content;
+    box-shadow: 0 2px 20px rgba(0, 14, 255, 0.4);
+    margin-top: 10px;
+    background: white;
+}
+.containerSellTicket .sellTicketButton{
+    background: blue;
+    border-radius: 20px;
+    color: white;
+}
+.containerSellTicket .sellTicketButton:hover{
+    background: red;
+}
+/*contentEvent*/
+.contentEvent .inforEvent img{
+    border-radius: 20px;
+    padding: 10px;
+}
+/*Content*/
+.summarize{
+    position: sticky;
+    top: 80px;
+}
+.contentEvent{
+    border-radius: 20px;
+    margin-bottom: 3rem;
+}
+.contentEvent .inforEvent{
+    flex: 2;
+    background: white;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    margin-right: 10px;
+    border-radius: 20px;
+}
+.contentEvent .inforEvent h4{
+    margin-left: 20px;
+    margin-top: 10px;
+    color: #e36500;
+}
+/*summarize*/
+.contentEvent .summarize {
+    flex: 1;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+    height: fit-content;
+}
+.summarize .summarize_avatar img{
+    border-radius: 20px;
+    padding:10px;
+}
+.summarize_containerSellTicket .summarize_minPrice{
+    width: fit-content;
+    margin: auto;
+}
+.summarize_containerSellTicket .summarize_sellTicketButton{
+    background: blue;
+    border-radius: 20px;
+    color: white;
+}
+.summarize_containerSellTicket .summarize_sellTicketButton:hover{
+    background: red;
+    color: white;
+}
+

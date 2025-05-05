@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventReponse {
+    private UUID id;
     @Column(nullable = false, length = 100)
     private String name;
     private String avatar;
@@ -21,6 +23,5 @@ public class EventReponse {
     private LocalDate eventDate;
     @Column(nullable = false,columnDefinition = "LONGTEXT")
     private String description;
-    private int total;
     private double minPrice;
 }

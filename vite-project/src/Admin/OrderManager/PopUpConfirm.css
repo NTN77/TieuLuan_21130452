@@ -1,0 +1,10 @@
+.containerConfirm {
+        position: fixed;
+        top: 35%;
+        left: 35%;
+        background: #c6f1fa;
+        border-radius: 20px;
+}
+.btnSend:hover {
+        background: red;
+}

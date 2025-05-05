@@ -1,0 +1,8 @@
+.containerPopUp{
+    position: fixed;
+    top: 5%;
+    left: 30%;
+    background: #c6f1fa;
+    border-radius: 20px;
+}
+

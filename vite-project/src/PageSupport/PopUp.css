@@ -1,0 +1,10 @@
+.containerScreen{
+    background: #f5f4f4;
+}
+.containerSPInformation{
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+
+}

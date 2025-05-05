@@ -34,10 +34,13 @@ public class SecurityConfig {
             "/user","/user/{id}","/user/SignIn/sendCode"
             ,"/auth/token","/auth/introspect",
             "/auth/loginGG","/auth/facebook",
-            "/images/upload",
-    }, PUBLIC_ENDPOINTS_GET = {"/event/findByName","/event/eventHome","/event/eventAll","/event/BTC"},
-    ENDPOINTS_GET_ADMIN = {"/user/allUser"}, // endpoint dành riêng cho admin
-    ENDPOINTS_POST_ADMIN = { "/event/createEvent","/event/addBTC"}; // endpoint dành riêng cho admin
+            "/images/upload","/signUpEvent/customerInformation","/Event/Payment/vn-pay",
+            "/user/changeInformation"},
+            PUBLIC_ENDPOINTS_GET = {"/event/findByName","/event/eventHome","/event/eventAll",
+            "/event/eventTop6Sell","/event/BTC","/event/search","/event/filter","/event/eventDetail",
+            "/Event/Payment/vn-pay-callback","/information/listEventSignIn"},
+    ENDPOINTS_GET_ADMIN = {"/user/allUser","/admin/dashboard/dataDashBoard","/admin/findByUser/{id}","/admin/allEvent","/admin/eventDetail","/admin/orderManagerEvent","/admin/allCustomerOfEvent","/admin/exportCustomers"}, // endpoint dành riêng cho admin
+    ENDPOINTS_POST_ADMIN = { "/event/createEvent","/event/addBTC","/admin/updateStatus","/admin/updateInformation","/admin/updateStatusEvent","/admin/editEvent","/admin/updateBibAndSendMail","/admin/editInformationSignIn"}; // endpoint dành riêng cho admin
 
 
     @Bean
@@ -48,8 +51,8 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, PUBLIC_ENDPOINTS_GET)
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET,ENDPOINTS_GET_ADMIN).hasAnyAuthority("ROLE_ADMIN")
-                        .requestMatchers(HttpMethod.POST,ENDPOINTS_POST_ADMIN).hasAnyAuthority("ROLE_ADMIN")
+                        .requestMatchers(HttpMethod.GET,ENDPOINTS_GET_ADMIN).hasAnyAuthority("ROLE_ADMIN","ROLE_MANAGER")
+                        .requestMatchers(HttpMethod.POST,ENDPOINTS_POST_ADMIN).hasAnyAuthority("ROLE_ADMIN","ROLE_MANAGER")
                         .anyRequest().authenticated()); // các endpoint còn lại phải đăng nhập
 
             httpSecurity.oauth2ResourceServer(

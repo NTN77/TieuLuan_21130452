@@ -1,0 +1,16 @@
+.containerSupport{
+    display: grid;
+    grid-template-columns: repeat(2, 0fr);
+    gap: 10px;
+}
+.box button{
+    width: 15rem;
+    background: #6cacf3;
+    height: 10rem;
+    margin: 10px;
+}
+.box button:hover{
+    background: red;
+    color: white;
+}
+

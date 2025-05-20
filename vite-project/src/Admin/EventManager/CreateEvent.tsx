@@ -19,7 +19,7 @@ const CreateEvent = ({cancelCreateEvent}) => {
     const [awardImages, setAwardImages] = useState(null);
     const [ticketStages, setTicketStages] = useState([]);
     const [loading,setLoading] = useState(false);
-    const { tokenContext } = useContext(AuthContext);
+    const { tokenContext,idContext } = useContext(AuthContext);
     const { usernameContext,roleContext } = useContext(AuthContext);
     const navigator = useNavigate();
     useEffect(() => {
@@ -34,8 +34,9 @@ const CreateEvent = ({cancelCreateEvent}) => {
 
     // Cập nhật thông tin giai đoạn vé
     const handleStageChange = (index, field, value) => {
+        const numericValue = parseFloat(value.replace(/\D/g, ''));
         const newStages = [...ticketStages];
-        newStages[index][field] = value;
+        newStages[index][field] = numericValue;
         setTicketStages(newStages);
     };
 
@@ -76,7 +77,7 @@ const CreateEvent = ({cancelCreateEvent}) => {
         formData.append("award", awardImages);
 
         try {
-            const response = await fetch("http://localhost:8080/TicketRunning/event/createEvent", {
+            const response = await fetch(`http://localhost:8080/TicketRunning/event/createEvent?idAdmin=${idContext}`, {
                 method: "POST",
                 body: formData,
                 headers: {

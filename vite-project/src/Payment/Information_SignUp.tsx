@@ -35,6 +35,8 @@ const Information_SignUp = () => {
     const [isValid, setIsValid] = useState(true);
     const [isValidCCCD, setIsValidCCCD] = useState(true);
     const [isValidSDT, setIsValidSDT] = useState(true);
+    const [isValidSDTKC, setIsValidSDTKC] = useState(true);
+
 
 
     const handleSubmit = async () => {
@@ -95,6 +97,13 @@ const Information_SignUp = () => {
             setIsValidSDT(false);
         }else{
             setIsValidSDT(true);
+        }
+    }
+    const validateSDTKC = (number) => {
+        if(number.length != 10){
+            setIsValidSDTKC(false);
+        }else{
+            setIsValidSDTKC(true);
         }
     }
 
@@ -248,9 +257,11 @@ const Information_SignUp = () => {
                         </div>
                         <div className="inforPhoneKC form-floating" style={{width: "48%"}}>
                             <input type="number" className="form-control" id="floatingInput"
-                                   placeholder="Nhập Số Điện Thoại Khẩn Cấp" required={true} onChange={(e) => setPhoneKCSignUp(e.target.value)}/>
+                                   placeholder="Nhập Số Điện Thoại Khẩn Cấp" required={true} onChange={(e) => {setPhoneKCSignUp(e.target.value); validateSDTKC(e.target.value)}}/>
                             <label htmlFor="floatingInput" className={"fst-italic"}
                                    style={{color: "#9a9a9a"}}>Số Điện Thoại Khẩn Cấp </label>
+                            {!isValidSDTKC && (<p className={"text-danger"}>Số điện thoại bao gồm 10 số.</p>)}
+
                         </div>
                     </div>
                     <div className={"inforMedicine my-3"}>

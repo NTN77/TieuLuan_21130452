@@ -22,11 +22,10 @@ const EditCustomerInformation = ({Customer,cancelEdit}) => {
     const [isValid, setIsValid] = useState(true);
     const [isValidCCCD, setIsValidCCCD] = useState(true);
     const [isValidSDT, setIsValidSDT] = useState(true);
-    const { tokenContext } = useContext(AuthContext);
+    const { tokenContext,idContext } = useContext(AuthContext);
     const [loading,setLoading] = useState(false);
 
     useEffect(() => {
-        console.log(Customer);
         if (Customer) {
             setNameSignUp(Customer.userName);
             setPhoneSignUp(Customer.phoneNumber);
@@ -48,7 +47,7 @@ const EditCustomerInformation = ({Customer,cancelEdit}) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-            const reponse = await fetch(`http://localhost:8080/TicketRunning/admin/editInformationSignIn`, {
+            const reponse = await fetch(`http://localhost:8080/TicketRunning/admin/editInformationSignIn?idAdmin=${idContext}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

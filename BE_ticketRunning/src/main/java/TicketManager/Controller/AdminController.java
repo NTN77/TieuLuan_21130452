@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +46,8 @@ public class AdminController {
     final UserService userService;
     final CloudinaryService cloudinaryService;
     final MailService mailService;
+    final BTCService btcService;
+    final LogService logService;
 
     //Lấy ra data số lượng đăng ký để làm dashboard
     @GetMapping("/dashboard/dataDashBoard")
@@ -76,10 +79,19 @@ public class AdminController {
 
     //quyền admin khóa và mở khóa tài khoản
     @PostMapping("/updateStatus")
-    public ResponseEntity<APIReponse<Boolean>> updateStatus(@RequestParam String idUser, @RequestParam boolean status) {
+    public ResponseEntity<APIReponse<Boolean>> updateStatus(@RequestParam String idUser, @RequestParam boolean status,@RequestParam("idAdmin") UUID idAdmin) {
         try {
             UUID id = java.util.UUID.fromString(idUser);
             boolean result = userService.updateStatus(id, status);
+            String detail = "";
+            if(status) {
+                detail = "Chỉnh sửa mở khóa user có ID: " + idUser;
+            }else{
+                detail = "Chỉnh sửa khóa user có ID: " + idUser;
+            }
+            String action = "Chỉnh Sửa User";
+            User u = userService.findUserById(idAdmin);
+            logService.saveLog(action,u,detail);
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
         } catch (AppException ex) {
             return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
@@ -101,6 +113,8 @@ public class AdminController {
     public ResponseEntity<APIReponse<Boolean>> updateInformation(@RequestBody EditInformationRequest request) {
         try {
             boolean result = userService.updateInformation(request.getIdUser(), request.getEmail(), request.getNewName(), request.getIdRole());
+            User u = userService.findUserById(request.getIdAdmin());
+            logService.saveLog("Chỉnh Sửa Thông Tin",u,"Chỉnh sửa thông tin user có ID: " + request.getIdUser());
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
         } catch (AppException ex) {
             return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
@@ -158,10 +172,19 @@ public class AdminController {
     }
 
     @PostMapping("/updateStatusEvent")
-    public ResponseEntity<APIReponse<Boolean>> updateStatusEvent(@RequestParam String idEvent, @RequestParam boolean status) {
+    public ResponseEntity<APIReponse<Boolean>> updateStatusEvent(@RequestParam String idEvent, @RequestParam boolean status ,@RequestParam("idAdmin") UUID idAdmin) {
         try {
             UUID id = java.util.UUID.fromString(idEvent);
             boolean result = eventService.updateStatusEvent(id, status);
+            String detail = "";
+            if(status) {
+                detail = "Chỉnh sửa mở khóa sự kiện có ID: " + idEvent;
+            }else{
+                detail = "Chỉnh sửa khóa sự kiện có ID: " + idEvent;
+            }
+            String action = "Chỉnh Sửa event";
+            User u = userService.findUserById(idAdmin);
+            logService.saveLog(action,u,detail);
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
         } catch (AppException ex) {
             return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
@@ -214,7 +237,8 @@ public class AdminController {
                                                             @RequestPart(value = "policy", required = false) MultipartFile policy,
                                                             @RequestPart(value = "schedule", required = false) MultipartFile schedule,
                                                             @RequestPart(value = "sizeChart", required = false) MultipartFile sizeChart,
-                                                            @RequestPart(value = "award", required = false) MultipartFile award) {
+                                                            @RequestPart(value = "award", required = false) MultipartFile award,
+                                                            @RequestParam("idAdmin") UUID idAdmin) {
         try {
             Event event = eventService.findById(idEvent);
             boolean setEvent = false;
@@ -280,6 +304,9 @@ public class AdminController {
                 System.out.println(stage);
                 priceEventService.createPriceEvent(stage, event);
             }
+            User u = userService.findUserById(idAdmin);
+            logService.saveLog("Chỉnh Sửa Sự Kiện" , u,"Chỉnh sửa thông tin của sự kiện có ID: " + idEvent);
+
             return ResponseEntity.ok(APIReponse.<Event>builder().result(event).build());
 
         } catch (IOException e) {
@@ -331,7 +358,7 @@ public class AdminController {
 
     //Update bib cho người đăng ký khi gửi thông tin
     @PostMapping("/updateBibAndSendMail")
-    public ResponseEntity<APIReponse<Boolean>> updateBibAndSendInfor(@RequestParam("idCustomer") UUID idCustomer , @RequestParam("bib") String bib){
+    public ResponseEntity<APIReponse<Boolean>> updateBibAndSendInfor(@RequestParam("idCustomer") UUID idCustomer , @RequestParam("bib") String bib ){
         try {
             boolean result = customerInformationService.updateBib(idCustomer,bib);
             CustomerInformation ci = customerInformationService.findById(idCustomer);
@@ -347,6 +374,7 @@ public class AdminController {
                             "\t Tỉnh/Thành Phố: " +ci.getProvince();
             mailService.sendQRCodeEmail(u.getEmail(),"Thông báo nhận BIB",qrData);
             mailService.sendQRCodeEmail(ci.getEmail(),"Thông báo nhận BIB",qrData);
+
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
             //Thiếu gửi email
         } catch (AppException ex) {
@@ -366,7 +394,7 @@ public class AdminController {
 
     //Xuất ra excel dữ liệu
     @GetMapping("/exportCustomers")
-    public void exportUsersToExcel( @RequestParam("idEvent") UUID idEvent,HttpServletResponse response ) throws IOException {
+    public void exportUsersToExcel( @RequestParam("idEvent") UUID idEvent,HttpServletResponse response ,@RequestParam("idAdmin") UUID idAdmin) throws IOException {
         List<CustomerInformation> customers = customerInformationService.printExcel(idEvent);
         if (customers.isEmpty() ) {
             throw new AppException(ErrorCode.NOT_PRINT_EXCEL);
@@ -426,11 +454,15 @@ public class AdminController {
         workbook.write(outputStream);
         workbook.close();
         outputStream.close();
+        User u = userService.findUserById(idAdmin);
+        logService.saveLog("Xuất file sự kiện",u,"Xuất file danh sách tham gia sự kiện " + e.getName());
     }
     @PostMapping(value ="/editInformationSignIn")
-    public ResponseEntity<APIReponse<Boolean>> editInformationSignIn(@RequestBody CustomerSignInRequest request){
+    public ResponseEntity<APIReponse<Boolean>> editInformationSignIn(@RequestBody CustomerSignInRequest request,@RequestParam("idAdmin") UUID idAdmin){
         try {
             boolean result = customerInformationService.editInformationSignIn(request);
+            User u = userService.findUserById(idAdmin);
+            logService.saveLog("Chỉnh sửa thông tin đăng ký",u,"Chỉnh sửa thông tin đăng ký của user có ID: " + request.getIdUser());
             return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
         } catch (AppException ex) {
             return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
@@ -446,5 +478,45 @@ public class AdminController {
                             .build());
         }
 
+    }
+
+    @PostMapping("/updateStatusBTC")
+    public ResponseEntity<APIReponse<Boolean>> updateStatusBTC(@RequestParam String idBTC, @RequestParam boolean status) {
+        try {
+            UUID id = java.util.UUID.fromString(idBTC);
+            boolean result = btcService.updateStatus(id,status);
+            return ResponseEntity.ok(APIReponse.<Boolean>builder().result(result).build());
+        } catch (AppException ex) {
+            return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+                    .body(APIReponse.<Boolean>builder()
+                            .code(ex.getErrorCode().getCode())
+                            .message(ex.getErrorCode().getMessage())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIReponse.<Boolean>builder()
+                            .code(500)
+                            .message("An unexpected error occurred")
+                            .build());
+        }
+    }
+    @GetMapping("/Log")
+    public ResponseEntity<APIReponse<List<Log>>> getAll(){
+        try {
+            List<Log> logs = logService.findAll();
+            return ResponseEntity.ok(APIReponse.<List<Log>>builder().result(logs).build());
+        } catch (AppException ex) {
+            return ResponseEntity.status(ex.getErrorCode().getHttpStatus())
+                    .body(APIReponse.<List<Log>>builder()
+                            .code(ex.getErrorCode().getCode())
+                            .message(ex.getErrorCode().getMessage())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(APIReponse.<List<Log>>builder()
+                            .code(500)
+                            .message("An unexpected error occurred")
+                            .build());
+        }
     }
 }

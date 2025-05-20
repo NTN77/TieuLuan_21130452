@@ -3,7 +3,7 @@ import {Autoplay, Navigation, Pagination} from "swiper/modules";
 import {Link, useNavigate} from "react-router-dom";
 import {IoTimeOutline} from "react-icons/io5";
 import {CiLocationOn} from "react-icons/ci";
-import {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import {FaFireAlt} from "react-icons/fa";
 import Swal from "sweetalert2";
 import {AuthContext} from "../Context/AuthContext.tsx";
@@ -69,32 +69,56 @@ const Carousel = () => {
             </div>
             <div className="carousel-intro">
                 <Swiper
+                    className={"py-3 px-1"}
                     modules={[Navigation, Pagination, Autoplay]}
                     spaceBetween={10} // khoảng cách giữa các ảnh
                     slidesPerView={3} //sốluowuong anh
                     navigation
                     pagination={{clickable: true}}
                     autoplay={{delay: 5000, disableOnInteraction: false}}
-                    loop={true}
+                    loop={false}
+
                 >
                     {events && events.map((img, index) => (
                         <SwiperSlide key={index} style={boxShadow} className={"p-2"}>
                             <Link to={`/Event/detailEvent/${img.id}`}>
                                 <img src={img.avatar} alt={img.avatar} className="carousel-image"/>
-                                <p className={"my-2 mx-3 fw-bold fs-6"} style={{color: "Black",height: "2rem"}}>{img.name}</p>
+                                <p className={"my-2 mx-3 fw-bold fs-6"}
+                                   style={{color: "Black", height: "4rem"}}>{img.name}</p>
                                 <p className={"mx-3 my-1"} style={{color: "Black"}}><IoTimeOutline
                                     style={{color: "red"}}/> {img.eventDate}</p>
                                 <p className={"mx-3 my-1"} style={{color: "Black"}}><CiLocationOn
                                     style={{color: "red"}}/>{img.location}</p>
                                 <div className={"d-flex mx-3"}>
                                     <div>
-                                        <p className={"m-0 fw-light"} style={{color: "black"}}>Chỉ từ</p>
-                                        <strong className={"fs-5 text-danger fst-italic"}>{new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(img.minPrice)}</strong>
+                                        {Number(img.minPrice) != 0 ? (
+                                            <div><p className={"m-0 fw-light"}
+                                                    style={{color: "black"}}>Chỉ
+                                                từ</p>
+                                                <strong
+                                                    className={"fs-5 text-danger fst-italic"}>{new Intl.NumberFormat("vi-VN", {
+                                                    style: "currency",
+                                                    currency: "VND"
+                                                }).format(img.minPrice)}</strong></div>
+                                        ) : (
+                                            <p className={"text-danger d-flex justify-content-center fw-bold fs-5"}>Hết
+                                                Bán</p>)}
+
                                     </div>
+
                                     <div className={"ms-auto"}>
-                                        <button onClick={()=> handleButtonSignUp(img.id)} className="hover_button p-3"
-                                              style={borderRadiusButton}>Đăng
-                                            Ký</button>
+
+                                        {img.minPrice != 0 ? (
+                                            <button onClick={() => handleButtonSignUp(img.id)}
+                                                    className="hover_button p-3"
+                                                    style={borderRadiusButton}>Đăng
+                                                Ký</button>
+                                        ) : (<button
+                                                     disabled={true}
+                                                     className="hover_button p-3"
+                                                     style={borderRadiusButton}>Đăng
+                                            Ký</button>)}
+
                                     </div>
                                 </div>
                             </Link>

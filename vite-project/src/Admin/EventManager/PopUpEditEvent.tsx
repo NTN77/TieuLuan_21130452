@@ -31,7 +31,7 @@ const PopUpEditEvent = ({idEvent,cancelEditEvent}) => {
 
     const [ticketStages, setTicketStages] = useState([]);
     const [loading,setLoading] = useState(false);
-    const { usernameContext,tokenContext } = useContext(AuthContext);
+    const { usernameContext,tokenContext,idContext } = useContext(AuthContext);
     const navigator = useNavigate();
     //hàm giúp upload ảnh cũ lên để chỉnh sửa
     const handleImageChangeAvatar = (e) => {
@@ -155,8 +155,9 @@ const PopUpEditEvent = ({idEvent,cancelEditEvent}) => {
 
     // Cập nhật thông tin giai đoạn vé
     const handleStageChange = (index, field, value) => {
+        const numericValue = parseFloat(value.replace(/\D/g, ''));
         const newStages = [...ticketStages];
-        newStages[index][field] = value;
+        newStages[index][field] = numericValue;
         setTicketStages(newStages);
     };
 
@@ -191,7 +192,7 @@ const PopUpEditEvent = ({idEvent,cancelEditEvent}) => {
         formData.append("award", awardImages);
 
         try {
-            const response = await fetch("http://localhost:8080/TicketRunning/admin/editEvent", {
+            const response = await fetch(`http://localhost:8080/TicketRunning/admin/editEvent?idAdmin=${idContext}`, {
                 method: "POST",
                 body: formData,
                 headers: {

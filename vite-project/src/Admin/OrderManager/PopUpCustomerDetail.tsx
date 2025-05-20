@@ -9,7 +9,7 @@ const PopUpCustomerDetail = ({customer,cancel}) => {
     };
     return(
         <div className={"overlay"}>
-            <div className={"containerPopUp p-3 w-50"}>
+            <div className={"containerPopUpDetail p-3 w-50"}>
                 <div className="d-flex mt-3 justify-content-between align-items-center">
                     <h3 className="text-center mb-0 mx-auto">Thông tin chi tiết</h3>
                     <MdOutlineCancel onClick={cancel} className="cursor-pointer"/>

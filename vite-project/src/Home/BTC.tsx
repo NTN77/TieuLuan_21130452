@@ -20,7 +20,7 @@ const  BTC = () => {
                 SetBtc(data.result);
             })
             .catch(error => console.error("Lỗi:", error));
-    }, [btc]);
+    }, []);
     return (
         <div className="logo-grid-container">
             {btc.map((logo) => (

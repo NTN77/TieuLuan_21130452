@@ -15,4 +15,5 @@ public class EditInformationRequest {
     String email;
     UUID idUser;
     int idRole;
+    UUID idAdmin;
 }

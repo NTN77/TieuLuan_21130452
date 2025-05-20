@@ -4,13 +4,23 @@ import {IoMdArrowRoundBack} from "react-icons/io";
 import {AuthContext} from "../../Context/AuthContext.tsx";
 import Swal from "sweetalert2";
 import Loading from "../../Payment/Loading.tsx";
-const PopUpConfirm = ({customer,cancelConfirm}) => {
+const PopUpConfirm = ({customer,cancelConfirm,customerList}) => {
     const [bib,setBib] = useState();
     const [loading,setLoading] = useState(false);
     const { tokenContext } = useContext(AuthContext);
+    const [validateBib,setValidateBib] = useState(false);
 
     const onChangeBib = (bib) => {
         setBib(bib);
+    }
+
+    const validateB = (bibCurrent) =>{
+        const exists = customerList.some((customer) => customer.bib === bibCurrent);
+        if(exists){
+            setValidateBib(true);
+        }else{
+            setValidateBib(false);
+        }
     }
 
     const updateBibAndSendEmail = async (e) => {
@@ -60,11 +70,14 @@ const PopUpConfirm = ({customer,cancelConfirm}) => {
                 </div>
                 <div>
                     <label className={"fw-bold me-2"}>Nhập số bib:</label>
-                    <input type={"text"} value={bib} onChange={e => onChangeBib(e.target.value)}
+                    <input type={"text"} value={bib} onChange={(e) => {
+                        onChangeBib(e.target.value);validateB(e.target.value)
+                    }}
                            placeholder={"Nhập số bib ..."} required={true}/>
+                    {validateBib && <p className={"text-danger d-flex justify-content-center mt-2 mb-0"}>Số bib đã có!</p>}
                 </div>
                 <div className={" mt-4 d-flex justify-content-center"}>
-                    <button type={"submit"} className={"btnSend bg-success text-white"} onClick={updateBibAndSendEmail}>Gửi thông tin</button>
+                    <button type={"submit"} className={"btnSend bg-success text-white"} onClick={updateBibAndSendEmail} disabled={validateBib}>Gửi thông tin</button>
                 </div>
             </div>
             {loading && (<Loading/>)}

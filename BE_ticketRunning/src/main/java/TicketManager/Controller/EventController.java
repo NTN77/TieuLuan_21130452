@@ -9,11 +9,9 @@ import TicketManager.DTO.Request.EventRequest;
 import TicketManager.Entity.BTC;
 import TicketManager.Entity.Event;
 import TicketManager.Entity.EventDetail;
+import TicketManager.Entity.User;
 import TicketManager.Exception.AppException;
-import TicketManager.Service.BTCService;
-import TicketManager.Service.EventDetailService;
-import TicketManager.Service.EventService;
-import TicketManager.Service.PriceEventService;
+import TicketManager.Service.*;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -29,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,9 +39,12 @@ public class EventController {
     final BTCService btcService;
     final EventDetailService eventDetailService;
     final PriceEventService priceEventService;
+    final UserService userService;
+    final LogService logService;
 
     @PostMapping(value = "/createEvent",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<APIReponse<Event>> createEvent(
+            @RequestParam("idAdmin") UUID idAdmin,
             @RequestParam("fileAvatar") MultipartFile fileAvatar,
             @RequestParam("name") String name,
             @RequestParam("location") String location,
@@ -92,6 +94,8 @@ public class EventController {
                 System.out.println(stage);
                 priceEventService.createPriceEvent(stage,event);
             }
+            User u = userService.findUserById(idAdmin);
+            logService.saveLog("Thêm Sự Kiện" , u,"Thêm sự kiện có tên: " + event.getName() );
             return ResponseEntity.ok(APIReponse.<Event>builder().result(event).build());
 
         } catch (AppException ex) {

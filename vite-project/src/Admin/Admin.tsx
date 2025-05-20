@@ -1,5 +1,5 @@
 import {Link, useNavigate} from "react-router-dom";
-import { MdDashboard, MdOutlineEventNote} from "react-icons/md";
+import {MdDashboard, MdHistory, MdOutlineEventNote} from "react-icons/md";
 import {RiAccountBox2Line} from "react-icons/ri";
 import {CiLogout, CiShop} from "react-icons/ci";
 import {Dropdown, DropdownItem, DropdownMenu, DropdownToggle} from "reactstrap";
@@ -11,6 +11,8 @@ import "./Admin.css"
 import AccountManager from "./AccountManager/AccountManager.tsx";
 import EventManager from "./EventManager/EventManager.tsx";
 import OrderManager from "./OrderManager/OrderManager.tsx";
+import {CgOrganisation} from "react-icons/cg";
+import Log from "./Log/Log.tsx";
 
 const Admin = () => {
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -20,6 +22,8 @@ const Admin = () => {
     const [accountManager,setAccountManager] = useState(false);
     const [eventManager,setEventManager] = useState(false);
     const [orderManager,setOrderManager] = useState(false);
+    const [log,setLog] = useState(false);
+
 
     const toggle = () => setDropdownOpen((prevState) => !prevState);
     useEffect(() => {
@@ -37,21 +41,32 @@ const Admin = () => {
         setOrderManager(false);
         setAccountManager(false);
         setEventManager(false);
+        setLog(false);
     }
     const openAccountManager = () => {
         setAccountManager(true);
         setDashBoard(false);
         setOrderManager(false);
         setEventManager(false);
+        setLog(false);
     }
     const openEventManager = () => {
         setEventManager(true);
         setDashBoard(false);
         setOrderManager(false);
         setAccountManager(false);
+        setLog(false);
     }
     const openOrderManager = () => {
         setOrderManager(true);
+        setDashBoard(false);
+        setAccountManager(false);
+        setEventManager(false);
+        setLog(false);
+    }
+    const openLog = () => {
+        setLog(true);
+        setOrderManager(false);
         setDashBoard(false);
         setAccountManager(false);
         setEventManager(false);
@@ -64,14 +79,29 @@ const Admin = () => {
                         <Link to={"/"}><h3
                             className={"d-flex justify-content-center mt-4 text-black fw-bold"}>NTNRunning</h3></Link>
                         <div className={"d-grid ps-5 pe-1 mt-5"}>
-                            <button className={`${dashboard ? "buttonSelect" : "buttonDashboard"} my-1 `} onClick={openDashBoard}><MdDashboard/> Dashboard</button>
-                            <button className={`${accountManager ? "buttonSelect" : "buttonDashboard"} my-1 `} onClick={openAccountManager}><RiAccountBox2Line/> Quản Lý Tài Khoản</button>
-                            <button className={`${eventManager ? "buttonSelect" : "buttonDashboard"} my-1 `} onClick={openEventManager}><MdOutlineEventNote/> Quản Lý Sự Kiện</button>
-                            <button className={`${orderManager ? "buttonSelect" : "buttonDashboard"} my-1 `} onClick={openOrderManager}><CiShop/> Quản Lý Đơn Hàng</button>
+                            <button className={`${dashboard ? "buttonSelect" : "buttonDashboard"} my-1 `}
+                                    onClick={openDashBoard}><MdDashboard/> Dashboard
+                            </button>
+                            <button className={`${accountManager ? "buttonSelect" : "buttonDashboard"} my-1 `}
+                                    onClick={openAccountManager}><RiAccountBox2Line/> Quản Lý Tài Khoản
+                            </button>
+                            <button className={`${eventManager ? "buttonSelect" : "buttonDashboard"} my-1 `}
+                                    onClick={openEventManager}><MdOutlineEventNote/> Quản Lý Sự Kiện
+                            </button>
+                            <button className={`${orderManager ? "buttonSelect" : "buttonDashboard"} my-1 `}
+                                    onClick={openOrderManager}><CiShop/> Quản Lý Đơn Hàng
+                            </button>
+                            {roleContext == "ADMIN" && (
+                                <button className={`${log ? "buttonSelect" : "buttonDashboard"} my-1 `}
+                                        onClick={openLog}><MdHistory/> Lịch Sử
+                                </button>
+                            )}
+
                         </div>
                     </div>
                     <div className={"adminRight w-100 h-100"}>
-                        <div className={"menuTop bg-dark w-100 d-flex justify-content-between align-content-center"} style={{height: "10vh"}}>
+                        <div className={"menuTop bg-dark w-100 d-flex justify-content-between align-content-center"}
+                             style={{height: "10vh"}}>
                             <div style={{width: "fit-content"}} className={"ms-5 mt-3"}>
                                 <Link to={"/"} className={"text-info"}><FaHome className={"text-info"}/> Trang Chủ</Link>
                             </div>
@@ -106,6 +136,7 @@ const Admin = () => {
                             {accountManager && <AccountManager/>}
                             {eventManager && <EventManager/>}
                             {orderManager && <OrderManager/>}
+                            {log && <Log/>}
                         </div>
                     </div>
 

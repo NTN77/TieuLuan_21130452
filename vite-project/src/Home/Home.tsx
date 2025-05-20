@@ -55,7 +55,7 @@ const Home = () => {
             })
             .catch(error => console.error("Lỗi:", error));
         setLoading(false);
-    }, [event]);
+    }, []);
 
 
     const borderRadiusS = {
@@ -153,10 +153,10 @@ const Home = () => {
                                >
                                    {eventTopSell && eventTopSell.map((img, index) => (
                                        <SwiperSlide key={index} style={boxShadow} className={"p-2"}>
-                                           <Link to={`Event/detailEvent/${img.id}`}>
+                                           <Link to={`/Event/detailEvent/${img.id}`}>
                                                <img src={img.avatar} alt={img.avatar} className="carousel-image"/>
                                                <p className={"my-2 mx-3 fw-bold fs-6"}
-                                                  style={{color: "Black", height: "2rem"}}>{img.name}</p>
+                                                  style={{color: "Black", height: "4rem"}}>{img.name}</p>
                                                <p className={"mx-3 my-1"} style={{color: "Black"}}><IoTimeOutline
                                                    style={{color: "red"}}/> {img.eventDate}</p>
                                                <p className={"mx-3 my-1"} style={{color: "Black"}}><CiLocationOn

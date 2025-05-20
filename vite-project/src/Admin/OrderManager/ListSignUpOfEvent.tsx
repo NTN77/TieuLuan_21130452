@@ -11,7 +11,7 @@ import EditCustomerInformation from "./EditCustomerInformation.tsx";
 const ListSignUpOfEvent = ({eventSelect,cancel}) => {
     const [customers,setCustomers] = useState([]);
     const [search, setSearch] = useState('');
-    const { tokenContext } = useContext(AuthContext);
+    const { tokenContext,idContext } = useContext(AuthContext);
 
     const eventPerPage = 5;
     const [pageNumber, setPageNumber] = useState(0);
@@ -52,13 +52,14 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
             })
             .then(data => {
                 setCustomers(sortCustomer(data.result) || []);
+                console.log(data.result)
             })
             .catch(error => console.error("Lỗi:", error));
     };
     useEffect(() => {
             fetchEvent();
         },
-        [fetchEvent]);
+        []);
 
     // Tìm kiếm và lọc event
     const filteredCustomers = customers.filter(customer =>
@@ -121,7 +122,7 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
         }
         setLoading(true);
             try {
-                const response = await fetch(`http://localhost:8080/TicketRunning/admin/exportCustomers?idEvent=${eventSelect.id}`, {
+                const response = await fetch(`http://localhost:8080/TicketRunning/admin/exportCustomers?idEvent=${eventSelect.id}&idAdmin=${idContext}`, {
                     method: 'GET',
                     headers: {
                         "Authorization": `Bearer ${tokenContext}`
@@ -257,7 +258,7 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
                 )}
             </div>
             {openPopUp && (<PopUpCustomerDetail customer={customerSelect} cancel={cacelPopUp}/>)}
-            {confirmButton && (<PopUpConfirm customer={customerSelect} cancelConfirm={cacelConfirm}/>)}
+            {confirmButton && (<PopUpConfirm customer={customerSelect} cancelConfirm={cacelConfirm} customerList={customers}/>)}
             {openEditInformation && (<EditCustomerInformation Customer={customerSelect} cancelEdit={cacelEdit}/>)}
             {loading && (<Loading/>)}
         </div>

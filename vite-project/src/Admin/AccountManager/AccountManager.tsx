@@ -7,7 +7,7 @@ import PopUpEdit from "./PopUpEdit.tsx";
 const AccountManager = () => {
     const [users, setUsers] = useState([]);
     const [search, setSearch] = useState('');
-    const { tokenContext,roleContext } = useContext(AuthContext);
+    const { tokenContext,roleContext,idContext } = useContext(AuthContext);
 
     const usersPerPage = 7;
     const [pageNumber, setPageNumber] = useState(0);
@@ -35,10 +35,10 @@ const AccountManager = () => {
     };
     useEffect(() => {
         fetchUser();
-    },[fetchUser]);
+    },[]);
         const actionAccount = async (id,status) => {
         try {
-            const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatus?idUser=${id}&status=${!status}`, {
+            const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatus?idUser=${id}&status=${!status}&idAdmin=${idContext}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${tokenContext}`,

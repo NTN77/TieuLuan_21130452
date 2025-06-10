@@ -52,7 +52,7 @@ const OrderManager =() => {
     useEffect(() => {
             fetchEvent();
         },
-        []);
+        [fetchEvent]);
 
     // Tìm kiếm và lọc event
     const filteredEvents = event.filter(event =>

@@ -25,6 +25,15 @@ const PopUpConfirm = ({customer,cancelConfirm,customerList}) => {
 
     const updateBibAndSendEmail = async (e) => {
         e.preventDefault();
+        if ((bib || '').trim() === '') {
+            Swal.fire({
+                title: "Mã bib không được rỗng!",
+                icon: "error",
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
         setLoading(true);
         try {
             const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateBibAndSendMail?idCustomer=${customer.id}&bib=${bib}`, {

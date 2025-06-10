@@ -30,8 +30,7 @@ const PopUpEdit = ({idUser,cancel}) => {
                 setRoleId(data.result.role.id);
 
             })
-            // .catch(error => console.error("Lỗi:", error));
-    }, []);
+    }, [idUser, tokenContext]);
     const saveInformation = async (e) => {
         e.preventDefault();
         try {

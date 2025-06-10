@@ -223,7 +223,7 @@ const Login = () => {
                 </form>
                 <div className={"signIn d-flex justify-content-center mt-2"}>
                     <span>Bạn chưa có tài khoản? </span>
-                    <span className={"ms-1"} onClick={() => navigate("/SignIn")}
+                    <span className={"ms-1"} onClick={() => navigate("/Register")}
                           style={{cursor: "pointer", color: "red", textDecoration: "underline"}}>Đăng Ký</span>
                 </div>
                 <div className={"mt-3"}>

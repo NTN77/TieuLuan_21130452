@@ -32,28 +32,35 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             " AND ep.dateFinish >= :currentDate), 0) " +
             "FROM Event e WHERE e.status = true")
     List<Object[]> findAllEventsWithMinPrice(@Param("currentDate") LocalDate currentDate);
-
-    //Top 9 giải gần nhất
-    @Query("SELECT e.id,e.name AS name, e.avatar AS avatar, e.location AS location, " +
-            "e.eventDate AS eventDate, e.description AS description, " +
+    @Query("SELECT e.id, e.name, e.avatar, e.location, e.eventDate, e.description, " +
             "COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
-            " WHERE ep.event.id = e.id " +
-            " AND ep.dateStart <= :currentDate " +
-            " AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
-            "FROM Event e WHERE e.status = true " +
+            "          WHERE ep.event.id = e.id " +
+            "          AND ep.dateStart <= :currentDate " +
+            "          AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
+            "FROM Event e " +
+            "WHERE e.status = true AND " +
+            "      COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
+            "               WHERE ep.event.id = e.id " +
+            "               AND ep.dateStart <= :currentDate " +
+            "               AND ep.dateFinish >= :currentDate), 0) > 0 " +
             "ORDER BY e.eventDate ASC")
-    List<Object[]> findTop6Event(@Param("currentDate") LocalDate currentDate);
+
+    List<Object[]> findTop9Event(@Param("currentDate") LocalDate currentDate);
 
     //Top 6 giải được bán nhiều nhất
     @Query("SELECT e.id, e.name, e.avatar, e.location, e.eventDate, e.description, " +
             "COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
-            "WHERE ep.event.id = e.id " +
-            "AND ep.dateStart <= :currentDate " +
-            "AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
+            "         WHERE ep.event.id = e.id " +
+            "         AND ep.dateStart <= :currentDate " +
+            "         AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
             "FROM Event e " +
             "JOIN PriceEvent pe ON e.id = pe.event.id " +
+            "WHERE e.status = true " +
             "GROUP BY e.id, e.name, e.avatar, e.location, e.eventDate, e.description " +
-            "ORDER BY SUM(pe.sold) DESC")
+            "HAVING COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
+            "                WHERE ep.event.id = e.id " +
+            "                AND ep.dateStart <= :currentDate " +
+            "                AND ep.dateFinish >= :currentDate), 0) > 0")
     List<Object[]> findTop6EventsByTotalSold(@Param("currentDate") LocalDate currentDate, Pageable pageable);
     //Lấy ra kết quả tìm kiếm
     @Query(value = "SELECT e.id, e.name AS name, e.avatar AS avatar, e.location AS location, " +

@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 import Loading from "../Payment/Loading.tsx";
 
 
-const SignIn = () => {
+const Register = () => {
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -240,4 +240,4 @@ const SignIn = () => {
         </div>
     );
 };
-export default SignIn;
+export default Register;

@@ -35,7 +35,7 @@ const AccountManager = () => {
     };
     useEffect(() => {
         fetchUser();
-    },[]);
+    },[fetchUser]);
         const actionAccount = async (id,status) => {
         try {
             const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatus?idUser=${id}&status=${!status}&idAdmin=${idContext}`, {
@@ -50,7 +50,6 @@ const AccountManager = () => {
             }
 
             const result = await response.json();
-            console.log(result);
             if(result.result == true) {
                 setUsers(prevUsers =>
                     prevUsers.map(user =>
@@ -58,7 +57,6 @@ const AccountManager = () => {
                     ));
             }
         } catch (error) {
-            console.error(error);
             alert('Lỗi khi cập nhật!');
         }
     };

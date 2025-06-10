@@ -23,7 +23,6 @@ const Event_Detail = () => {
             })
             .then(data => {
                 setEvent(data.result);
-                console.log("Dữ liệu nhận được:", data);
             })
             .catch(error => console.error("Lỗi:", error));
 

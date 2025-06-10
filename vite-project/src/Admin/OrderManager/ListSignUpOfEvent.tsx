@@ -59,7 +59,7 @@ const ListSignUpOfEvent = ({eventSelect,cancel}) => {
     useEffect(() => {
             fetchEvent();
         },
-        []);
+        [fetchEvent]);
 
     // Tìm kiếm và lọc event
     const filteredCustomers = customers.filter(customer =>

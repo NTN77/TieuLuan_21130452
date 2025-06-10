@@ -39,7 +39,7 @@ const EventManager =() => {
     useEffect(() => {
             fetchEvent();
         },
-        []);
+        [fetchEvent]);
     const actionAccount = async (id,status) => {
         try {
             const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatusEvent?idEvent=${id}&status=${!status}&idAdmin=${idContext}`, {

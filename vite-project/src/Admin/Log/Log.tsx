@@ -41,7 +41,7 @@ const Log =() => {
     useEffect(() => {
             fetchEvent();
         },
-        []);
+        [fetchEvent]);
 
     // Tìm kiếm và lọc event
     const filteredLog = logs.filter(log =>
@@ -84,7 +84,7 @@ const Log =() => {
                 <div className="mb-3">
                     <input
                         type="text"
-                        placeholder="Tìm kiếm theo tên, địa điểm diễn ra hoặc ngày diễn ra..."
+                        placeholder="Tìm kiếm theo hành động, thời gian..."
                         className="form-control"
                         value={search}
                         onChange={(e) => {

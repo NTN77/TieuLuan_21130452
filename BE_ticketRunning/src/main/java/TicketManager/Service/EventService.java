@@ -63,9 +63,8 @@ public class EventService {
         return eventRepository.findEventByName(name);
     }
 
-    //Lấy 6 event gâần nhất
     public List<EventReponse> listTop6EventHome() {
-        List<Object[]> rawResults = eventRepository.findTop6Event(LocalDate.now());
+        List<Object[]> rawResults = eventRepository.findTop9Event(LocalDate.now());
         List<EventReponse> events = new ArrayList<>();
 
         for (Object[] row : rawResults) {

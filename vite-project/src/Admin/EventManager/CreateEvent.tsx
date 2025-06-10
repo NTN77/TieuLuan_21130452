@@ -95,9 +95,6 @@ const CreateEvent = ({cancelCreateEvent}) => {
                 timer: 2000,
                 showConfirmButton: false
             });
-            const data = await response.json();
-            console.log("Sự kiện được tạo thành công!", data);
-
         } catch (error) {
             console.error("Lỗi khi tạo sự kiện:", error);
         }

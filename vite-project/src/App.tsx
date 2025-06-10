@@ -1,7 +1,7 @@
 import { Routes, Route, useLocation } from "react-router-dom";
 import Home from "./Home/Home";
 import Login from "./Login/Login";
-import SignIn from "./Login/SignIn.tsx";
+import Register from "./Login/Register.tsx";
 import Admin from "./Admin/Admin.tsx";
 import Menubar from "./MenuBar_Footer/MenuBar.tsx";
 import Footer from "./MenuBar_Footer/Footer.tsx";
@@ -19,8 +19,8 @@ import NewsDetail from "./News/NewsDetail.tsx";
 
 function App() {
     const location = useLocation();
-    const showMenubar = location.pathname !== "/Login" && location.pathname !== "/SignIn" && location.pathname !== "/Admin/createEvent" && location.pathname !== "/Admin";
-    const showFooter = location.pathname !== "/Login" && location.pathname !== "/SignIn" && location.pathname !== "/Admin/createEvent" && location.pathname !== "/Admin" && location.pathname !== "/News" && !location.pathname.startsWith("/News/");;
+    const showMenubar = location.pathname !== "/Login" && location.pathname !== "/Register" && location.pathname !== "/Admin/createEvent" && location.pathname !== "/Admin";
+    const showFooter = location.pathname !== "/Login" && location.pathname !== "/Register" && location.pathname !== "/Admin/createEvent" && location.pathname !== "/Admin" && location.pathname !== "/News" && !location.pathname.startsWith("/News/");;
 
     return (
         <GoogleOAuthProvider clientId="697065721574-jb6163gmpmhn607933dgvmbettr2c2fj.apps.googleusercontent.com">
@@ -31,7 +31,7 @@ function App() {
                 {/*Trang User*/}
                 <Route path="/" element={<Home />} />
                 <Route path="/Login" element={<Login />} />
-                <Route path="/SignIn" element={<SignIn />} />
+                <Route path="/Register" element={<Register />} />
                 <Route path="/Event" element={<Event_List />} />
                 <Route path="/searchEvent" element={<Event_Search/>} />
                 <Route path="/Event/detailEvent/:id" element={<Event_Detail/>} />

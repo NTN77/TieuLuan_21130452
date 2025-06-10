@@ -58,11 +58,13 @@ public class EventDetailService {
     //xóa các event detail cũ
     public void DeleteEventDetail(String nameED, UUID idEvent){
         EventDetail ed = eventDetailRepository.findEventDetailByEvent_IdAndAndNameImage(idEvent,nameED);
-        boolean deleteImage = cloudinaryService.deleteImage(ed.getUrl());
-        if(deleteImage){
-            eventDetailRepository.deleteByEventIdAAndNameImage(idEvent,nameED);
-        }else {
-            throw new AppException(ErrorCode.DELETE_EVENT_FAILED);
+        if(ed != null ){
+            boolean deleteImage = cloudinaryService.deleteImage(ed.getUrl());
+            if(deleteImage){
+                eventDetailRepository.deleteByEventIdAAndNameImage(idEvent,nameED);
+            }else {
+                throw new AppException(ErrorCode.DELETE_EVENT_FAILED);
+            }
         }
     }
 }

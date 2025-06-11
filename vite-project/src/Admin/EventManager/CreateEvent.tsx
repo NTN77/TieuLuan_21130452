@@ -99,6 +99,12 @@ const CreateEvent = ({cancelCreateEvent}) => {
         } catch (error) {
             console.error("Lỗi khi tạo sự kiện:", error);
             setLoading(false);
+            Swal.fire({
+                title: "Kích cỡ ảnh quá lớn!",
+                icon: "error",
+                timer: 2000,
+                showConfirmButton: false
+            });
         }
 
     };

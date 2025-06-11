@@ -123,6 +123,9 @@ const Login = () => {
                     setError(err.message);
                 }
             }
+            const err = await reponse.json();
+            setLoading(false);
+            setError(err.message);
         }
     };
     const responseFacebook = async (response) => {

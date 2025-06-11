@@ -70,8 +70,8 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             " AND ep.dateStart <= :currentDate " +
             " AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
             "FROM Event e " +
-            "WHERE (FUNCTION('MONTH', e.eventDate) = :month AND FUNCTION('YEAR', e.eventDate) = :year) " +
-            "OR e.name LIKE %:name%")
+            "WHERE  e.status = true AND (FUNCTION('MONTH', e.eventDate) = :month AND FUNCTION('YEAR', e.eventDate) = :year) " +
+            "OR e.name LIKE %:name% AND e.status = true")
     List<Object[]> findEventByEventDateOrNameContain(@Param("currentDate") LocalDate currentDate,
                                                      @Param("month") int month,
                                                      @Param("year") int year,
@@ -83,7 +83,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             " AND ep.dateStart <= :currentDate " +
             " AND ep.dateFinish >= :currentDate), 0) AS minPrice " +
             "FROM Event e " +
-            "WHERE (FUNCTION('MONTH', e.eventDate) = :month AND FUNCTION('YEAR', e.eventDate) = :year)")
+            "WHERE  e.status = true AND (FUNCTION('MONTH', e.eventDate) = :month AND FUNCTION('YEAR', e.eventDate) = :year)  ")
     List<Object[]> findEventByEventDate(@Param("currentDate") LocalDate currentDate,
                                                      @Param("month") int month,
                                                      @Param("year") int year);
@@ -99,6 +99,7 @@ public interface EventRepository extends JpaRepository<Event, UUID> {
             "AND COALESCE((SELECT MIN(ep.price) FROM PriceEvent ep " +
             " WHERE ep.event.id = e.id " +
             " AND ep.dateStart <= :currentDate " +
+            " AND e.status = true" +
             " AND ep.dateFinish >= :currentDate), 0) <= :priceFilter")
     List<Object[]> filterEvent(@Param("currentDate") LocalDate currentDate,
                                         @Param("month") int month,

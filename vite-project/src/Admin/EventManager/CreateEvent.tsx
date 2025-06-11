@@ -19,7 +19,7 @@ const CreateEvent = ({cancelCreateEvent}) => {
     const [awardImages, setAwardImages] = useState(null);
     const [ticketStages, setTicketStages] = useState([]);
     const [loading,setLoading] = useState(false);
-    const { tokenContext } = useContext(AuthContext);
+    const { tokenContext,idContext } = useContext(AuthContext);
     const { usernameContext,roleContext } = useContext(AuthContext);
     const navigator = useNavigate();
     useEffect(() => {
@@ -35,7 +35,9 @@ const CreateEvent = ({cancelCreateEvent}) => {
     // Cập nhật thông tin giai đoạn vé
     const handleStageChange = (index, field, value) => {
         const newStages = [...ticketStages];
-        newStages[index][field] = value;
+        newStages[index][field] = field === 'price'
+            ? parseFloat(value.replace(/\D/g, '')) || '' // chỉ parseFloat nếu là 'distance'
+            : value; // giữ nguyên nếu là 'name'
         setTicketStages(newStages);
     };
 
@@ -76,7 +78,7 @@ const CreateEvent = ({cancelCreateEvent}) => {
         formData.append("award", awardImages);
 
         try {
-            const response = await fetch("http://localhost:8080/TicketRunning/event/createEvent", {
+            const response = await fetch(`http://localhost:8080/TicketRunning/event/createEvent?idAdmin=${idContext}`, {
                 method: "POST",
                 body: formData,
                 headers: {
@@ -94,11 +96,9 @@ const CreateEvent = ({cancelCreateEvent}) => {
                 timer: 2000,
                 showConfirmButton: false
             });
-            const data = await response.json();
-            console.log("Sự kiện được tạo thành công!", data);
-
         } catch (error) {
             console.error("Lỗi khi tạo sự kiện:", error);
+            setLoading(false);
         }
 
     };

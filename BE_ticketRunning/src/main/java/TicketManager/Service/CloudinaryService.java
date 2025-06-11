@@ -29,9 +29,7 @@ public class CloudinaryService {
     public boolean deleteImage(String imageUrl) {
         try {
             String publicId = extractPublicId(imageUrl);
-
             Map result = cloudinary.uploader().destroy(publicId, Map.of());
-
             // Kiểm tra kết quả trả về
             return "ok".equals(result.get("result"));
         } catch (Exception e) {

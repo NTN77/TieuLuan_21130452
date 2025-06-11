@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +35,23 @@ public class BTCService {
         }
         BTC btc1 = new BTC();
         btc1.setName(btc.getName());
+        btc1.setStatus(true);
         btcRepository.save(btc1);
         String imageUrl = cloudinaryService.uploadImage(file.getBytes(), btc1.getId(), btc1.getName());
         btc1.setUrlImage(imageUrl);
         return btcRepository.save(btc1);
     }
     public List<BTC> getAll(){
-        return btcRepository.findAll();
+        return btcRepository.getAll();
+    }
+
+    public boolean updateStatus(UUID id,boolean status) {
+        return btcRepository.updateStatus(id,status) > 0;
+    }
+    public boolean updateBTC(UUID id , String name , String urlImage){
+        return btcRepository.updateBTC(name,urlImage,id) > 0;
+    }
+    public boolean updateBTCNoAvatar(UUID id ,String name){
+        return btcRepository.updateBTC(name,id) > 0;
     }
 }

@@ -10,7 +10,7 @@ const PopUpEdit = ({idUser,cancel}) => {
     const [roleId,setRoleId] = useState();
 
 
-    const {tokenContext } = useContext(AuthContext);
+    const {tokenContext ,idContext} = useContext(AuthContext);
 
     useEffect(() => {
         fetch(`http://localhost:8080/TicketRunning/admin/findByUser?idUser=${idUser}`, {
@@ -30,7 +30,6 @@ const PopUpEdit = ({idUser,cancel}) => {
                 setRoleId(data.result.role.id);
 
             })
-            .catch(error => console.error("Lỗi:", error));
     }, [idUser, tokenContext]);
     const saveInformation = async (e) => {
         e.preventDefault();
@@ -42,6 +41,7 @@ const PopUpEdit = ({idUser,cancel}) => {
                     email: email,
                     idUser: idUser,
                     idRole: roleId,
+                    idAdmin: idContext
                 }),
                 headers: {
                     "Content-Type": "application/json",

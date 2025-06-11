@@ -1,9 +1,10 @@
 import SearchBar from "../MenuBar_Footer/SearchBar.tsx";
 import Event from "../Home/Event.tsx";
-import {useState} from "react";
+import React, {useState} from "react";
 import "../EventList/Event_List.css"
 import {useLocation} from "react-router-dom";
 import {FaFaceSadTear} from "react-icons/fa6";
+import {FaFireAlt} from "react-icons/fa";
 
 const Event_Search = () => {
     const eventsPerPage = 9; // Số sự kiện
@@ -18,6 +19,12 @@ const Event_Search = () => {
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
     };
+    const borderRadiusS = {
+        border: "1px solid red",
+        borderRadius: "50px",
+        width: "fit-content",
+
+    }
 
     return (
         <div style={{ width: "100%", marginTop: "6%" }}>
@@ -25,6 +32,10 @@ const Event_Search = () => {
                 <SearchBar/>
             </div>
             <div className={"event"}>
+                <div className={"d-flex ms-4 p-1 my-0"} style={borderRadiusS}>
+                    <FaFireAlt style={{color: "red"}} className={"fs-3"}/>
+                    <p className={"fw-bold fs-5 m-0"}>Kết Quả Tìm Kiếm</p>
+                </div>
                 {/* Danh sách sự kiện 3x3 */}
                 {searchResults.length > 0 ? (
                     <div className="event_home d-grid gap-3" style={{gridTemplateColumns: "repeat(3, 1fr)"}}>

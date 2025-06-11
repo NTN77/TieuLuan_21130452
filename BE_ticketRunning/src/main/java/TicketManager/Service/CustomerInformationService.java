@@ -8,6 +8,7 @@ import TicketManager.DTO.Request.CustomerInformationRequest;
 import TicketManager.DTO.Request.CustomerSignInRequest;
 import TicketManager.Entity.CustomerInformation;
 import TicketManager.Entity.Event;
+import TicketManager.Entity.Log;
 import TicketManager.Repository.CustomerInformationRepo;
 import TicketManager.Repository.EventRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import java.util.UUID;
 public class CustomerInformationService {
     private final CustomerInformationRepo customerInformationRepo;
     private final EventRepository eventRepository;
+    private final LogService logService;
 
     public CustomerInformation findById(UUID id) {
         return customerInformationRepo.findCustomerInformationById(id);
@@ -177,8 +179,10 @@ public class CustomerInformationService {
 
     //update thông tin
     public boolean editInformationSignIn(CustomerSignInRequest request){
-        return customerInformationRepo.updateInformationSignIn(request.getIdUser(),request.getUserName(),request.getPhoneNumber(),request.getIdentityCard(),request.isGender(),request.getNationality(),
+        boolean edit =  customerInformationRepo.updateInformationSignIn(request.getIdUser(),request.getUserName(),request.getPhoneNumber(),request.getIdentityCard(),request.isGender(),request.getNationality(),
                 request.getCountry(),request.getBirthDate(),request.getProvince(),
                 request.getSizeChart(),request.getUserNameKC(),request.getPhoneNumberKC(),request.getBloodGroup(),request.getHealthCare()) > 0 ;
+//        logService.saveLog("Update" , )
+        return edit;
     }
 }

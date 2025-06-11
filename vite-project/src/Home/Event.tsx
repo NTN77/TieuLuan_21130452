@@ -33,15 +33,13 @@ const Event = ({event}) => {
                     navigation("/Login");
                 }
             });
-        } else {
-            navigation(`/Event/payment/${event.id}`);
         }
     };
     return (
        <div style={boxShadow} className={"pb-3"}>
            <Link to={`/Event/detailEvent/${event.id}`}>
            <img src={event.avatar} alt={event.alt} className="carousel-image"/>
-               <p className={"my-2 mx-3 fw-bold fs-6"} style={{color: "Black"}}>{event.name}</p>
+               <p className={"my-2 mx-3 fw-bold fs-6"} style={{color: "Black", height: "4rem"}}>{event.name}</p>
                <p className={"mx-3 my-1"} style={{color: "Black"}}><IoTimeOutline
                    style={{color: "red"}}/> {event.eventDate}</p>
                <p className={"mx-3 my-1"} style={{color: "Black"}}><CiLocationOn
@@ -68,7 +66,6 @@ const Event = ({event}) => {
                        <Button onClick={handleButtonSignUp} className="hover_button p-3" disabled={true} style={borderRadiusButton}>Đăng
                            Ký</Button>
                    </div>)}
-
                </div>
            </Link>
        </div>

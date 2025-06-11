@@ -7,7 +7,7 @@ import CreateEvent from "./CreateEvent.tsx";
 const EventManager =() => {
     const [event,setEvent] = useState([]);
     const [search, setSearch] = useState('');
-    const { tokenContext } = useContext(AuthContext);
+    const { tokenContext,idContext } = useContext(AuthContext);
 
     const eventPerPage = 5;
     const [pageNumber, setPageNumber] = useState(0);
@@ -32,7 +32,6 @@ const EventManager =() => {
             })
             .then(data => {
                 setEvent(data.result || []);
-                console.log(data.result)
             })
             .catch(error => console.error("Lỗi:", error));
     };
@@ -42,7 +41,7 @@ const EventManager =() => {
         [fetchEvent]);
     const actionAccount = async (id,status) => {
         try {
-            const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatusEvent?idEvent=${id}&status=${!status}`, {
+            const response = await fetch(`http://localhost:8080/TicketRunning/admin/updateStatusEvent?idEvent=${id}&status=${!status}&idAdmin=${idContext}`, {
                 method: 'POST',
                 headers: {
                     Authorization: `Bearer ${tokenContext}`,
@@ -54,7 +53,6 @@ const EventManager =() => {
             }
 
             const result = await response.json();
-            console.log(result);
             if(result.result == true) {
                 setEvent(prevUsers =>
                     prevUsers.map(event =>

@@ -22,6 +22,7 @@ const Home = () => {
     const [event, setEvent] = useState([]);
     const [eventTopSell,setEventTopSell] = useState([]);
     const [loading,setLoading] = useState(true);
+    const visibleSlides = 8; // số lượng hiển thị
     const Top6Sell = async () => {
         try {
             const response = await fetch(`http://localhost:8080/TicketRunning/event/eventTop6Sell`);
@@ -55,7 +56,7 @@ const Home = () => {
             })
             .catch(error => console.error("Lỗi:", error));
         setLoading(false);
-    }, [event]);
+    }, []);
 
 
     const borderRadiusS = {
@@ -97,8 +98,6 @@ const Home = () => {
                     navigation("/Login");
                 }
             });
-        } else {
-            navigation(`/Event/payment/${id}`);
         }
     };
 
@@ -124,7 +123,7 @@ const Home = () => {
                                autoplay={{delay: 3000, disableOnInteraction: false}}
                                loop={false}
                            >
-                               {event && event.map((event, index) => (
+                               {event && event.slice(0,visibleSlides).map((event, index) => (
                                    <SwiperSlide key={index}>
                                        <Link to={`Event/detailEvent/${event.id}`}>
                                            <img src={event.avatar} alt={event.alt} className="carousel-image"/>
@@ -153,14 +152,15 @@ const Home = () => {
                                >
                                    {eventTopSell && eventTopSell.map((img, index) => (
                                        <SwiperSlide key={index} style={boxShadow} className={"p-2"}>
-                                           <Link to={`Event/detailEvent/${img.id}`}>
+                                           <Link to={`/Event/detailEvent/${img.id}`}>
                                                <img src={img.avatar} alt={img.avatar} className="carousel-image"/>
                                                <p className={"my-2 mx-3 fw-bold fs-6"}
-                                                  style={{color: "Black", height: "2rem"}}>{img.name}</p>
+                                                  style={{color: "Black", height: "4rem"}}>{img.name}</p>
                                                <p className={"mx-3 my-1"} style={{color: "Black"}}><IoTimeOutline
                                                    style={{color: "red"}}/> {img.eventDate}</p>
                                                <p className={"mx-3 my-1"} style={{color: "Black"}}><CiLocationOn
                                                    style={{color: "red"}}/>{img.location}</p>
+
                                                <div className={"d-flex mx-3"}>
                                                    <div>
                                                        {Number(img.minPrice) != 0 ? (
@@ -213,7 +213,7 @@ const Home = () => {
                                </div>
                            </div>
                            <div className={"event_home"}>
-                               {event.map((event, index) => (
+                               {event.slice(0,9).map((event, index) => (
                                    <Event key={index} event={event}/>
                                ))}
                            </div>

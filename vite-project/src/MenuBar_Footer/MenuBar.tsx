@@ -1,4 +1,4 @@
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { IoTicket } from "react-icons/io5";
 import { useContext, useState } from "react";
@@ -15,8 +15,14 @@ const MenuBar = () => {
     const toggle = () => setDropdownOpen((prevState) => !prevState);
     const { tokenContext,roleContext } = useContext(AuthContext);
     const navigation = useNavigate();
+    const location = useLocation();
 
-    const handleButtonMyTicket = (id) => {
+    const getNavLinkClass = (path) => {
+        console.log(location.pathname);
+        return location.pathname === path ? "buttonActive nav-link " : "nav-link";
+    };
+
+    const handleButtonMyTicket = () => {
         if (tokenContext == null || tokenContext == "") {
             Swal.fire({
                 title: "Bạn cần đăng nhập!",
@@ -45,23 +51,23 @@ const MenuBar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                     <ul className="navbar-nav ms-auto">
                         <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/Event">
+                            <Link className={getNavLinkClass("/Event")} to="/Event">
                                 Giải Chạy
                             </Link>
                         </li>
-                        {/*<li className="nav-item">*/}
-                        {/*    <Link className="nav-link fs-5" to="">*/}
-                        {/*        Tin Tức*/}
-                        {/*    </Link>*/}
-                        {/*</li>*/}
                         <li className="nav-item">
-                            <Link className="nav-link fs-5" to="/support">
+                            <Link className={getNavLinkClass("/News")} to="/News">
+                                Tin Tức
+                            </Link>
+                        </li>
+                        <li className="nav-item">
+                            <Link className={getNavLinkClass("/support")} to="/support">
                                 Hỗ Trợ
                             </Link>
                         </li>
                         <li className="nav-item d-flex align-items-center">
                             <IoTicket className="text-primary me-1" />
-                            <button className="nav-link fs-5" onClick={handleButtonMyTicket}>
+                            <button className={getNavLinkClass("/myTicket")} onClick={handleButtonMyTicket}>
                                 Vé của tôi
                             </button>
                         </li>

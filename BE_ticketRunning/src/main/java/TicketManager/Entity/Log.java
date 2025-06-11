@@ -4,20 +4,24 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = "BTC")
+@Table(name = "Log")
 @Data
 @Entity
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class BTC {
+public class Log {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-    private String name;
-    private String urlImage;
-    private boolean status;
+    UUID id;
+    String action;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    User idUser;
+    LocalDateTime createAt;
+    String detail;
 }

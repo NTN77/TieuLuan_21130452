@@ -155,9 +155,10 @@ const PopUpEditEvent = ({idEvent,cancelEditEvent}) => {
 
     // Cập nhật thông tin giai đoạn vé
     const handleStageChange = (index, field, value) => {
-        const numericValue = parseFloat(value.replace(/\D/g, ''));
         const newStages = [...ticketStages];
-        newStages[index][field] = numericValue;
+        newStages[index][field] = field === 'price'
+            ? parseFloat(value.replace(/\D/g, '')) || '' // chỉ parseFloat nếu là 'distance'
+            : value; // giữ nguyên nếu là 'name'
         setTicketStages(newStages);
     };
 

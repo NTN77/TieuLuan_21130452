@@ -32,7 +32,6 @@ const EventManager =() => {
             })
             .then(data => {
                 setEvent(data.result || []);
-                console.log(data.result)
             })
             .catch(error => console.error("Lỗi:", error));
     };
@@ -54,7 +53,6 @@ const EventManager =() => {
             }
 
             const result = await response.json();
-            console.log(result);
             if(result.result == true) {
                 setEvent(prevUsers =>
                     prevUsers.map(event =>

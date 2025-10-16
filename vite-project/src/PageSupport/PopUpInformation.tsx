@@ -15,7 +15,7 @@ const PopUpInformation = ({cancel}) => {
             <div className={"containerSPInformation w-75 mx-auto"}>
                 <div className={"d-flex"}>
                     <button onClick={cancel}><IoMdArrowRoundBack className={"fs-1"} /></button>
-                    <h3 className={"d-flex mx-auto"}>HƯỚNG DẪN ĐĂNG KÝ VÉ CÁ NHÂN</h3>
+                    <h3 className={"d-flex mx-auto"}>HƯỚNG DẪN ĐĂNG KÝ TÀI KHOẢN</h3>
                 </div>
                 <div>
                     <div>

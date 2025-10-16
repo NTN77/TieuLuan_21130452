@@ -93,6 +93,9 @@ public class SecurityConfig {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+//        Bạn custom lại cách convert từ JWT sang GrantedAuthority.
+//        JwtGrantedAuthoritiesConverter mặc định sẽ lấy claim scope hoặc scp trong token để map thành quyền.
+//        setAuthorityPrefix("") xoá prefix mặc định SCOPE_ → nghĩa là nếu scope trong token là "read", thì GrantedAuthority sẽ là "read" thay vì "SCOPE_read"
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
             JwtGrantedAuthoritiesConverter defaultConverter = new JwtGrantedAuthoritiesConverter();
             defaultConverter.setAuthorityPrefix("");
